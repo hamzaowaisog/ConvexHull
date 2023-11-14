@@ -234,6 +234,9 @@ public class GrahamScanConvexHull extends Application {
         gc.setLineWidth(2);
         gc.strokeLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
     }
+    public static void main(String[] args) {
+        launch();
+    }
 
 
 }
