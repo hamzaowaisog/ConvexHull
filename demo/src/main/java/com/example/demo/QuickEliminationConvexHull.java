@@ -36,7 +36,7 @@ public class QuickEliminationConvexHull extends Application {
 
         Scene scene = new Scene(pane, 650, 1000);
 
-        stage.setTitle("Graham Scan Convex Hull");
+        stage.setTitle("Quick Elimination Convex Hull");
         scene.setFill(Color.LIGHTGRAY);
 
         gc.setFill(Color.WHITE);
