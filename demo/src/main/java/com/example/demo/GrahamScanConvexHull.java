@@ -84,6 +84,20 @@ public class GrahamScanConvexHull extends Application {
             pane.getChildren().remove(t8);
             pane.getChildren().remove(t10);
             pane.getChildren().remove(t12);
+            points.clear();
+        });
+
+        points = new ArrayList<>();
+        pane.setOnMouseClicked(event -> {
+            double x = event.getX();
+            double y = event.getY();
+
+
+                points p = new points(x,y);
+                if (isPointWithinCanvas(p)) {
+                    points.add(new points(x,y));
+                    givedotscordinates(points, "p" + points.size(),points.size()-1);
+                }
         });
 
         pane.getChildren().add(t1);
@@ -113,23 +127,7 @@ public class GrahamScanConvexHull extends Application {
         t8.setY(750);
         pane.getChildren().add(t8);
 
-        double xcord, ycord;
-        double max = canvas.getHeight();
-        double min = canvas.getWidth();
 
-        points = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            xcord = (Math.random() * min) + 10;
-            ycord = (Math.random() * max) + 10;
-
-            points p = new points(xcord, ycord);
-            if (isPointWithinCanvas(p)) {
-                points.add(new points(xcord, ycord));
-                givedotscordinates(points, "p" + (i + 1), i);
-            } else {
-                i--;
-            }
-        }
         findConvexHull(points);
 
     }
@@ -146,7 +144,10 @@ public class GrahamScanConvexHull extends Application {
         dots.setFill(javafx.scene.paint.Color.RED);
         dots.setStroke(javafx.scene.paint.Color.BLACK);
 
-        Text text = new Text(label);
+        String formattedX = String.format("%.2f", x);
+        String formattedY = String.format("%.2f", y);
+
+        Text text = new Text(label + "(" + formattedX + "," + formattedY + ")");
         text.setId("dots");
         text.setX(x - 10);
         text.setY(y - 10);

@@ -213,15 +213,18 @@ public class SlopeMethod extends Application {
 
     }
 
-    public void createdots(double x, double y,String label){
-        Circle dots = new Circle(x,y,5);
+    public void createdots ( double x, double y, String label){
+        Circle dots = new Circle(x, y, 5);
         dots.setFill(javafx.scene.paint.Color.RED);
         dots.setStroke(javafx.scene.paint.Color.BLACK);
 
-        Text text = new Text(label);
+        String formattedX = String.format("%.2f", x);
+        String formattedY = String.format("%.2f", y);
+
+        Text text = new Text(label + "(" + formattedX + "," + formattedY + ")");
         text.setId("dots");
-        text.setX(x-10);
-        text.setY(y-10);
+        text.setX(x - 10);
+        text.setY(y - 10);
         pane.getChildren().add(dots);
         pane.getChildren().add(text);
 
@@ -336,6 +339,7 @@ public class SlopeMethod extends Application {
     }
     public void colordots(){
         for (points intersection : intersectionpoints) {
+            givedotscordinates(intersection,"I");
             Circle intersectionDot = new Circle(intersection.getX(), intersection.getY(), 5);
             intersectionDot.setFill(javafx.scene.paint.Color.GREEN);
             intersectionDot.setStroke(javafx.scene.paint.Color.BLACK);
