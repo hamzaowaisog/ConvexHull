@@ -1,7 +1,12 @@
 package com.example.demo;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -12,6 +17,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -36,7 +42,7 @@ public class GrahamScanConvexHull extends Application {
 
         Scene scene = new Scene(pane, 650, 1000);
 
-        stage.setTitle("Jarvis March Convex Hull");
+        stage.setTitle("Graham Scan Convex Hull");
         scene.setFill(Color.LIGHTGRAY);
 
         gc.setFill(Color.WHITE);
@@ -155,7 +161,8 @@ public class GrahamScanConvexHull extends Application {
         pane.getChildren().add(text);
 
     }
-    private void findConvexHull(ArrayList<points> points){
+
+        private void findConvexHull(ArrayList<points> points){
         ArrayList<points> convexhull = new ArrayList<>();
         ArrayList<points> sortedpoints = new ArrayList<>();
         Stack <points> convex  = new Stack<>();
@@ -170,35 +177,169 @@ public class GrahamScanConvexHull extends Application {
                 p0 = p;
             }
         }
+        int down =0;
+        for(int i=0 ; i<n ;i++){
+            if(points.get(i).getY() < points.get(down).getY() || (points.get(i).getY() == points.get(down).getY() && points.get(i).getX()< points.get(down).getX())){
+                down = i;
+            }
+        }
+
 
         sortedpoints = comparator(points,p0);
         convex.push(sortedpoints.get(0));
         convex.push(sortedpoints.get(1));
         convex.push(sortedpoints.get(2));
 
-        for(int i = 3 ; i< n;i++){
-            while(orientation(nexttotop(convex),convex.peek(),sortedpoints.get(i)) == 1){
-                convex.pop();
-            }
-            convex.push(sortedpoints.get(i));
-        }
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        lines= new ArrayList<>();
+        int finaldown = down;
+        ArrayList<points> finalsortedpointd = sortedpoints;
+        Stack <points> finalconvex = convex;
+        ArrayList<points> finalconvexhull = convexhull;
+            final int[] finali = {3};
+            ArrayList<com.example.demo.points> finalSortedpoints = sortedpoints;
+            KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if(finali[0] < n && finali[0] < finalsortedpointd.size()){
+                   points p0 = finalconvex.pop();
+                   Line line =new Line(nexttotop(finalconvex).getX(),nexttotop(finalconvex).getY(),finalconvex.peek().getX(),finalconvex.peek().getY());
+                   line.setStroke(Color.RED);
+                   pane.getChildren().add(line);
+                   lines.add(line);
+                   finalconvex.push(p0);
+                   line = new Line(nexttotop(finalconvex).getX(),nexttotop(finalconvex).getY(),finalconvex.peek().getX(),finalconvex.peek().getY());
+                   line.setStroke(Color.RED);
+                   pane.getChildren().add(line);
+                   lines.add(line);
+                    if (finali[0] >= 3) {
+                        line = new Line(finalconvex.peek().getX(), finalconvex.peek().getY(), finalSortedpoints.get(finali[0]).getX(), finalSortedpoints.get(finali[0]).getY());
+                        line.setStroke(Color.GREEN);
+                        pane.getChildren().add(line);
+                        lines.add(line);
+                    }
 
-        while(!convex.isEmpty()){
-            convexhull.add(convex.pop());
-        }
 
-        for (int i =0 ; i<convexhull.size();i++){
-            points p1 = convexhull.get(i);
-            points p2 = convexhull.get((i+1) % convexhull.size());
-            drawLine(p1,p2);
-        }
+                   while(orientation(nexttotop(convex),convex.peek(), finalSortedpoints.get(finali[0])) == 1){
+                       points pop = convex.pop();
+                       for(Line line1 : lines){
+                           if(line1.getEndX() ==  pop.getX() || line1.getEndY() == pop.getY() ){
+                               pane.getChildren().remove(line1);
+                           }
+                       }
+                       if (finali[0] >= 3) {
+                           Line lineToRemove = lines.get(lines.size() - 1);
+                           pane.getChildren().remove(lineToRemove);
+                           lines.remove(lineToRemove);
+                       }
+                       if(finali[0] == n || finali[0] == finalSortedpoints.size()){
+                           line = new Line(finalconvex.peek().getX(), finalconvex.peek().getY(), finalSortedpoints.get(0).getX(), finalSortedpoints.get(0).getY());
+                           line.setStroke(Color.GREEN);
+                           pane.getChildren().add(line);
+                           lines.add(line);
+                       }
 
+                   }
+                   finalconvex.push(finalsortedpointd.get(finali[0]));
+                    finali[0]++;
+                }
+
+
+                if(finali[0] == n){
+                    timeline.stop();
+                    for(Line line : lines) {
+                        pane.getChildren().remove(line);
+                    }
+                    gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+
+                    while(!convex.isEmpty()) {
+                        convexhull.add(convex.pop());
+                    }
+
+                        for (int i =0 ; i<convexhull.size();i++){
+                            points p1 = convexhull.get(i);
+                            points p2 = convexhull.get((i+1) % convexhull.size());
+                            drawLine(p1,p2);
+                        }
+                    }
+                }
+        });
+        timeline.getKeyFrames().add(keyFrame);
+        timeline.play();
+
+            finaltime = System.currentTimeMillis();
+            timecomplexity = finaltime - initialtime;
+            t4 = new Text(String.valueOf(finaltime)+" miliseconds");
+            t4.setX(200);
+            t4.setY(600);
+            pane.getChildren().add(t4);
+
+            t6 = new Text(String.valueOf(timecomplexity)+" miliseconds");
+            t6.setX(200);
+            t6.setY(675);
+            pane.getChildren().add(t6);
+
+            finalmemoryusage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+            memorycomplexity = finalmemoryusage - initialmemoryusage;
+            t10 = new Text(String.valueOf(finalmemoryusage));
+            t10.setX(200);
+            t10.setY(825);
+            pane.getChildren().add(t10);
+
+            t12 = new Text(String.valueOf(memorycomplexity));
+            t12.setX(200);
+            t12.setY(900);
+            pane.getChildren().add(t12);
     }
+//    private void findConvexHull(ArrayList<points> points){
+//        ArrayList<points> convexhull = new ArrayList<>();
+//        ArrayList<points> sortedpoints = new ArrayList<>();
+//        Stack <points> convex  = new Stack<>();
+//        int n = points.size();
+//        if(n<3){
+//            return;
+//        }
+//
+//        points p0 = points.get(0);
+//        for(points p : points){
+//            if(p.getY() < p0.getY() || (p.getY() == p0.getY() && p.getX()<p0.getX())){
+//                p0 = p;
+//            }
+//        }
+//
+//        sortedpoints = comparator(points,p0);
+//        convex.push(sortedpoints.get(0));
+//        convex.push(sortedpoints.get(1));
+//        convex.push(sortedpoints.get(2));
+//
+//        for(int i = 3 ; i< n;i++){
+//            while(orientation(nexttotop(convex),convex.peek(),sortedpoints.get(i)) == 1){
+//                convex.pop();
+//            }
+//            convex.push(sortedpoints.get(i));
+//        }
+//
+//        while(!convex.isEmpty()){
+//            convexhull.add(convex.pop());
+//        }
+//
+//        for (int i =0 ; i<convexhull.size();i++){
+//            points p1 = convexhull.get(i);
+//            points p2 = convexhull.get((i+1) % convexhull.size());
+//            drawLine(p1,p2);
+//        }
+//
+//    }
     private points nexttotop(Stack<points> stack){
-        points p = stack.pop();
-        points res = stack.peek();
-        stack.push(p);
-        return res;
+
+        if(stack.size()>=2) {
+            points p = stack.pop();
+            points res = stack.peek();
+            stack.push(p);
+            return res;
+        }
+        return null;
     }
 
     public ArrayList<points> comparator (ArrayList<points> points , points p0){
