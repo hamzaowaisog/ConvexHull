@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class BruteForceConvexHull extends Application {
     ArrayList <points> points ;
@@ -164,6 +165,52 @@ public class BruteForceConvexHull extends Application {
         pane.getChildren().add(text);
 
     }
+
+//    public void findConvexHull(ArrayList<points> points){
+//        int n = points.size();
+//        if(n<3){
+//            return;
+//        }
+//        ArrayList<points> convexhull = new ArrayList<>();
+//        boolean onsameside = true ;
+//
+//        for(int i=0;i<n;i++){
+//            for (int j=i+1; j<n; j++){
+//                if(!points.get(i).equals(points.get(j))){
+//                    onsameside=true;;
+//                    for (int k=0 ; k<n;k++){
+//                        if(!points.get(i).equals(points.get(k)) && !points.get(j).equals(points.get(k))){
+//                            double cross = crossproduct(points.get(i),points.get(j),points.get(k));
+//                            if(cross>=0){
+//                                onsameside =false;
+//                                break;
+//                            }
+//                        }
+//
+//                    }
+//                    if(onsameside){
+//                       convexhull.add(points.get(i));
+//                       convexhull.add(points.get(j));
+//                    }
+//                }
+//
+//            }
+//        }
+//
+//    }
+//
+//    private double crossproduct(points p , points q , points r){
+//        double pqx = p.getX()-q.getX();
+//        double pqy = p.getY()-q.getY();
+//        double qrx = r.getX()-q.getX();
+//        double qry = r.getY()-q.getY();
+//
+//        double cross = (pqx*qry)-(pqy*qrx);
+//        return cross;
+//
+//    }
+//
+
     public void findConvexHull(ArrayList<points> pointsList) {
     int n = pointsList.size();
     ArrayList<points> convexHull = new ArrayList<>();
@@ -259,22 +306,12 @@ public class BruteForceConvexHull extends Application {
         t12.setY(900);
         pane.getChildren().add(t12);
 }
+
 private static int orientation(points p, points q, points r) {
     double val = (q.getY() - p.getY()) * (r.getX() - q.getX()) - (q.getX() - p.getX()) * (r.getY() - q.getY());
     if (val == 0) return 0;  // Collinear
     return (val > 0) ? 1 : 2; // Clockwise or counterclockwise
 }
-//    public void drawConvexHull() {
-//    ArrayList<points> convexHull = findConvexHull(points);
-//
-//    gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-//
-//    for (int i = 0; i < convexHull.size(); i++) {
-//        points p1 = convexHull.get(i);
-//        points p2 = convexHull.get((i + 1) % convexHull.size());
-//        drawLine(p1, p2);
-//    }
-//}
 
 
     private void drawLine(points p1, points p2) {
