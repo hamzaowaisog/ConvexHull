@@ -154,38 +154,115 @@ public class QuickHullConvexHull extends Application {
 
     }
 
-    ArrayList<points> convexhull = new ArrayList<>();
-public void findConvexHull(ArrayList<points> points) {
-    int n = points.size();
+    public void findConvexHull(ArrayList<points> points) {
+        ArrayList<points> convexHull = new ArrayList<>();
+        if (points.size() < 3){
+            return;
+        }
 
-    if (n<3){
-        return;
-    }
 
-    int left_most =0 ;
-    for(int i =0 ; i<points.size();i++){
-        if(points.get(i).getX()<points.get(left_most).getX()){
-            left_most = i;
+        int minPoint = -1, maxPoint = -1;
+        double minX = Integer.MAX_VALUE;
+        double maxX = Integer.MIN_VALUE;
+        for (int i = 0; i < points.size(); i++) {
+            if (points.get(i).getX() < minX) {
+                minX = points.get(i).getX();
+                minPoint = i;
+            }
+            if (points.get(i).getX() > maxX) {
+                maxX = points.get(i).getX();
+                maxPoint = i;
+            }
+        }
+        points A = points.get(minPoint);
+        points B = points.get(maxPoint);
+        convexHull.add(A);
+        convexHull.add(B);
+        points.remove(A);
+        points.remove(B);
+
+        ArrayList<points> leftSet = new ArrayList<>();
+        ArrayList<points> rightSet = new ArrayList<>();
+
+        for (int i = 0; i < points.size(); i++) {
+            points p = points.get(i);
+            if (pointLocation(A, B, p) == -1)
+                leftSet.add(p);
+            else
+                rightSet.add(p);
+        }
+        hullSet(A, B, rightSet, convexHull);
+        hullSet(B, A, leftSet, convexHull);
+
+        for(int i=0 ; i<convexHull.size();i++){
+            points p1 = convexHull.get(i);
+            points p2 = convexHull.get((i+1)%convexHull.size());
+            drawLine(p1,p2);
         }
     }
 
-    int right_most =0;
-
-    for(int i=0 ; i<points.size();i++){
-        if(points.get(i).getX()>points.get(right_most).getX()){
-            right_most = i;
-        }
+    public double distance(points A, points B, points C) {
+        double ABx = B.getX() - A.getX();
+        double ABy = B.getY() - A.getY();
+        double num = ABx * (A.getY() - C.getY()) - ABy * (A.getX() - C.getX());
+        if (num < 0)
+            num = -num;
+        return num;
     }
-    points left = points.get(left_most);
-    points right = points.get(right_most);
 
-    convexhull.add(left);
-    convexhull.add(right);
+    public void hullSet(points A, points B, ArrayList<points> set, ArrayList<points> hull) {
+        int insertPosition = hull.indexOf(B);
+        if (set.size() == 0)
+            return;
+        if (set.size() == 1) {
+            points p = set.get(0);
+            set.remove(p);
+            hull.add(insertPosition, p);
+            return;
+        }
+        double dist = Integer.MIN_VALUE;
+        int furthestPoint = -1;
+        for (int i = 0; i < set.size(); i++) {
+            points p = set.get(i);
+            double distance = distance(A, B, p);
+            if (distance > dist) {
+                dist = distance;
+                furthestPoint = i;
+            }
+        }
+        points P = set.get(furthestPoint);
+        set.remove(furthestPoint);
+        hull.add(insertPosition, P);
 
+        ArrayList<points> leftSetAP = new ArrayList<>();
+        for (int i = 0; i < set.size(); i++) {
+            points M = set.get(i);
+            if (pointLocation(A, P, M) == 1) {
+                leftSetAP.add(M);
+            }
+        }
 
-    drawLine(left,right);
+        ArrayList<points> leftSetPB = new ArrayList<>();
+        for (int i = 0; i < set.size(); i++) {
+            points M = set.get(i);
+            if (pointLocation(P, B, M) == 1) {
+                leftSetPB.add(M);
+            }
+        }
+        hullSet(A, P, leftSetAP, hull);
+        hullSet(P, B, leftSetPB, hull);
 
-}
+    }
+
+    public double pointLocation(points A, points B, points P) {
+        double cp1 = (B.getX() - A.getX()) * (P.getY() - A.getY()) - (B.getY() - A.getY()) * (P.getX() - A.getX());
+        if (cp1 > 0)
+            return 1;
+        else if (cp1 == 0)
+            return 0;
+        else
+            return -1;
+    }
     private void drawLine(points p1, points p2) {
         System.out.println("Drawing line from (" + p1.getX() + "," + p1.getY() + ") to (" + p2.getX() + "," + p2.getY() + ")");
         gc.setStroke(Color.BLUE);
