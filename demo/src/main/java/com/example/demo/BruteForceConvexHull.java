@@ -166,147 +166,263 @@ public class BruteForceConvexHull extends Application {
 
     }
 
-//    public void findConvexHull(ArrayList<points> points){
-//        int n = points.size();
-//        if(n<3){
-//            return;
+//    public void findConvexHull(ArrayList<points> pointsList) {
+//    int n = pointsList.size();
+//    ArrayList<points> convexHull = new ArrayList<>();
+//
+//    if (n < 3) {
+//        return;
+//    }
+//
+//    int l = 0;
+//    for (int i = 1; i < n; i++) {
+//        if (pointsList.get(i).getX() < pointsList.get(l).getX()) {
+//            l = i;
 //        }
-//        ArrayList<points> convexhull = new ArrayList<>();
-//        boolean onsameside = true ;
+//    }
+//    int p = l, q;
 //
-//        for(int i=0;i<n;i++){
-//            for (int j=i+1; j<n; j++){
-//                if(!points.get(i).equals(points.get(j))){
-//                    onsameside=true;;
-//                    for (int k=0 ; k<n;k++){
-//                        if(!points.get(i).equals(points.get(k)) && !points.get(j).equals(points.get(k))){
-//                            double cross = crossproduct(points.get(i),points.get(j),points.get(k));
-//                            if(cross>=0){
-//                                onsameside =false;
-//                                break;
-//                            }
-//                        }
+//    Timeline timeline = new Timeline();
+//    timeline.setCycleCount(Timeline.INDEFINITE);
+//    lines = new ArrayList<>();
+//    int finalL = l;
+//    KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
+//        int p = finalL, q;
+//        int i = 0;
+//        @Override
+//        public void handle(ActionEvent event) {
+//            if (i < n) {
+//                if (pointsList.get(i) != pointsList.get(p)) {
+//                    // Draw a line from the current point to all other points
+//                    Line line = new Line(pointsList.get(p).getX(), pointsList.get(p).getY(), pointsList.get(i).getX(), pointsList.get(i).getY());
+//                    line.setStroke(Color.RED);
+//                    pane.getChildren().add(line);
+//                    lines.add(line);
+//                }
 //
-//                    }
-//                    if(onsameside){
-//                       convexhull.add(points.get(i));
-//                       convexhull.add(points.get(j));
+//                if (orientation(pointsList.get(p), pointsList.get(i), pointsList.get(q)) == 2)
+//                    q = i;
+//
+//                i++;
+//            } else {
+//                // Remove all lines except the one between the current point and the next point
+//                for (Line line : lines) {
+//                    if (line.getEndX() != pointsList.get(q).getX() || line.getEndY() != pointsList.get(q).getY()) {
+//                        pane.getChildren().remove(line);
 //                    }
 //                }
 //
+//                convexHull.add(pointsList.get(p));
+//                p = q;
+//                q = (p + 1) % n;
+//                i = 0;
+//                lines.clear();
+//
+//                if (p == finalL) {
+//                    timeline.stop();
+//                    // Clear the canvas
+//                    gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+//
+//                    // Draw the final convex hull
+//                    for (int j = 0; j < convexHull.size(); j++) {
+//                        points p1 = convexHull.get(j);
+//                        points p2 = convexHull.get((j + 1) % convexHull.size());
+//                        drawLine(p1, p2);
+//                    }
+//                }
 //            }
 //        }
+//    });
 //
+//    timeline.getKeyFrames().add(keyFrame);
+//    timeline.play();
+//
+//        finaltime = System.currentTimeMillis();
+//        timecomplexity = finaltime - initialtime;
+//        t4 = new Text(String.valueOf(finaltime)+" miliseconds");
+//        t4.setX(200);
+//        t4.setY(600);
+//        pane.getChildren().add(t4);
+//
+//        t6 = new Text(String.valueOf(timecomplexity)+" miliseconds");
+//        t6.setX(200);
+//        t6.setY(675);
+//        pane.getChildren().add(t6);
+//
+//        finalmemoryusage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+//        memorycomplexity = finalmemoryusage - initialmemoryusage;
+//        t10 = new Text(String.valueOf(finalmemoryusage));
+//        t10.setX(200);
+//        t10.setY(825);
+//        pane.getChildren().add(t10);
+//
+//        t12 = new Text(String.valueOf(memorycomplexity));
+//        t12.setX(200);
+//        t12.setY(900);
+//        pane.getChildren().add(t12);
+//}
+    boolean shouldContinue=true;
+//    public void findConvexHull(ArrayList<points> points){
+//        ArrayList<points> convexhull = new ArrayList<>();
+//        for(int i = 0 ; i < points.size() ; i++){
+//            for (int j = 0 ; j < points.size() ; j++){
+//                if(points.get(i)!=points.get(j)){
+//                    //draw temp line ij
+//                    for(int k = 0 ; k < points.size() ; k++){
+//                        shouldContinue = true;
+//                        if(points.get(k) != points.get(j) && points.get(k)!=points.get(i)){
+//                            //draw line jk
+//                            if(ccwSlope(points.get(i),points.get(j),points.get(k))==-1){
+//                                //remove line jk
+//                                shouldContinue = false;
+//                            }
+//                            //remove line ij
+//                            if(!shouldContinue){
+//                                break;
+//                            }
+//                        }
+//                    }
+//                }
+//                if(shouldContinue){
+//                    //perma line ij
+//                    points p1 = new points(points.get(i).getX(),points.get(i).getY());
+//                    com.example.demo.points p2 = new points(points.get(j).getX(),points.get(j).getY());
+//                   drawLine(p1,p2);
+//                }
+//            }
+//        }
 //    }
-//
-//    private double crossproduct(points p , points q , points r){
-//        double pqx = p.getX()-q.getX();
-//        double pqy = p.getY()-q.getY();
-//        double qrx = r.getX()-q.getX();
-//        double qry = r.getY()-q.getY();
-//
-//        double cross = (pqx*qry)-(pqy*qrx);
-//        return cross;
-//
-//    }
-//
+public void findConvexHull(ArrayList<points> points){
+    ArrayList<points> convexhull = new ArrayList<>();
 
-    public void findConvexHull(ArrayList<points> pointsList) {
-    int n = pointsList.size();
-    ArrayList<points> convexHull = new ArrayList<>();
-
-    if (n < 3) {
-        return;
-    }
-
-    int l = 0;
-    for (int i = 1; i < n; i++) {
-        if (pointsList.get(i).getX() < pointsList.get(l).getX()) {
-            l = i;
-        }
-    }
-    int p = l, q;
-
-    Timeline timeline = new Timeline();
-    timeline.setCycleCount(Timeline.INDEFINITE);
-    lines = new ArrayList<>();
-    int finalL = l;
-    KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
-        int p = finalL, q;
-        int i = 0;
-        @Override
-        public void handle(ActionEvent event) {
-            if (i < n) {
-                if (pointsList.get(i) != pointsList.get(p)) {
-                    // Draw a line from the current point to all other points
-                    Line line = new Line(pointsList.get(p).getX(), pointsList.get(p).getY(), pointsList.get(i).getX(), pointsList.get(i).getY());
-                    line.setStroke(Color.RED);
-                    pane.getChildren().add(line);
-                    lines.add(line);
-                }
-
-                if (orientation(pointsList.get(p), pointsList.get(i), pointsList.get(q)) == 2)
-                    q = i;
-
-                i++;
-            } else {
-                // Remove all lines except the one between the current point and the next point
-                for (Line line : lines) {
-                    if (line.getEndX() != pointsList.get(q).getX() || line.getEndY() != pointsList.get(q).getY()) {
-                        pane.getChildren().remove(line);
-                    }
-                }
-
-                convexHull.add(pointsList.get(p));
-                p = q;
-                q = (p + 1) % n;
-                i = 0;
-                lines.clear();
-
-                if (p == finalL) {
-                    timeline.stop();
-                    // Clear the canvas
-                    gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-                    // Draw the final convex hull
-                    for (int j = 0; j < convexHull.size(); j++) {
-                        points p1 = convexHull.get(j);
-                        points p2 = convexHull.get((j + 1) % convexHull.size());
-                        drawLine(p1, p2);
+    for(int i = 0 ; i < points.size() ; i++){
+        for (int j = 0 ; j < points.size() ; j++){
+            if(points.get(i)!=points.get(j)){
+                for(int k = 0 ; k < points.size() ; k++){
+                    shouldContinue = true;
+                    if(points.get(k) != points.get(j) && points.get(k)!=points.get(i)){
+                        PauseTransition pause = new PauseTransition(Duration.seconds(k * 0.5));
+                        int finalI = i;
+                        int finalJ = j;
+                        int finalK = k;
+                        pause.setOnFinished(event -> {
+                            if(ccwSlope(points.get(finalI),points.get(finalJ),points.get(finalK))==-1){
+                                changeColor(points.get(finalK), Color.BLUE);
+                                shouldContinue = false;
+                            } else {
+                                changeColor(points.get(finalK), Color.BLACK);
+                            }
+                            PauseTransition pauseBack = new PauseTransition(Duration.seconds(0.5));
+                            pauseBack.setOnFinished(eventBack -> changeColor(points.get(finalK), Color.RED));
+                            pauseBack.play();
+                        });
+                        pause.play();
+                        if(!shouldContinue){
+                            break;
+                        }
                     }
                 }
             }
+            if(shouldContinue){
+                points p1 = new points(points.get(i).getX(),points.get(i).getY());
+                points p2 = new points(points.get(j).getX(),points.get(j).getY());
+                convexhull.add(p1);
+                convexhull.add(p2);
+            }
         }
-    });
+    }
+        Timeline timeline = new Timeline();
+    // For each pair of points in the convex hull
+    for (int i = 0; i < convexhull.size() - 1; i += 2) {
+        points p1 = convexhull.get(i);
+        points p2 = convexhull.get(i + 1);
 
-    timeline.getKeyFrames().add(keyFrame);
+        // Create a keyframe that draws a line between the two points
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(i * 0.5), e -> drawLine(p1, p2));
+
+        // Add the keyframe to the timeline
+        timeline.getKeyFrames().add(keyFrame);
+    }
+
+    // Play the timeline
     timeline.play();
 
-        finaltime = System.currentTimeMillis();
-        timecomplexity = finaltime - initialtime;
-        t4 = new Text(String.valueOf(finaltime)+" miliseconds");
-        t4.setX(200);
-        t4.setY(600);
-        pane.getChildren().add(t4);
-
-        t6 = new Text(String.valueOf(timecomplexity)+" miliseconds");
-        t6.setX(200);
-        t6.setY(675);
-        pane.getChildren().add(t6);
-
-        finalmemoryusage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        memorycomplexity = finalmemoryusage - initialmemoryusage;
-        t10 = new Text(String.valueOf(finalmemoryusage));
-        t10.setX(200);
-        t10.setY(825);
-        pane.getChildren().add(t10);
-
-        t12 = new Text(String.valueOf(memorycomplexity));
-        t12.setX(200);
-        t12.setY(900);
-        pane.getChildren().add(t12);
+    // Rest of your code...
 }
 
+    public void changeColor(points p, Color color) {
+        Circle circle = new Circle(p.getX(), p.getY(), 5);
+        circle.setFill(color);
+        pane.getChildren().add(circle);
+    }
+
+
+//    public void findConvexHull(ArrayList<points> points){
+//    ArrayList<points> convexhull = new ArrayList<>();
+//
+//    for(int i = 0 ; i < points.size() ; i++){
+//        for (int j = 0 ; j < points.size() ; j++){
+//            if(points.get(i)!=points.get(j)){
+//                for(int k = 0 ; k < points.size() ; k++){
+//                    shouldContinue = true;
+//                    if(points.get(k) != points.get(j) && points.get(k)!=points.get(i)){
+//                        if(ccwSlope(points.get(i),points.get(j),points.get(k))==-1){
+//                            shouldContinue = false;
+//                        }
+//                        if(!shouldContinue){
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//            if(shouldContinue){
+//                points p1 = new points(points.get(i).getX(),points.get(i).getY());
+//                com.example.demo.points p2 = new points(points.get(j).getX(),points.get(j).getY());
+//                convexhull.add(p1);
+//                convexhull.add(p2);
+//            }
+//        }
+//    }
+//
+//    // Create a new timeline
+//    Timeline timeline = new Timeline();
+//
+//    // For each pair of points in the convex hull
+//    for (int i = 0; i < convexhull.size() - 1; i += 2) {
+//        points p1 = convexhull.get(i);
+//        points p2 = convexhull.get(i + 1);
+//
+//        // Create a keyframe that draws a line between the two points
+//        KeyFrame keyFrame = new KeyFrame(Duration.seconds(i * 0.5), e -> drawLine(p1, p2));
+//
+//        // Add the keyframe to the timeline
+//        timeline.getKeyFrames().add(keyFrame);
+//    }
+//
+//    // Play the timeline
+//    timeline.play();
+//}
+
+    public double ccwSlope(points p0, points p1, points p2){
+        double dx1,dx2,dy1,dy2;
+        dx1 = p1.getX() - p0.getX();
+        dy1 = p1.getY() - p0.getY();
+        dx2 = p2.getX() - p0.getX();
+        dy2 = p2.getY() - p0.getY();
+        if(dx1*dy2 > dy1*dx2){
+            return 1;
+        }
+        if (dx1*dy2 < dy1*dx2){
+            return -1;
+        }
+        if ( (dx1*dx2 < 0) || (dy1*dy2 < 0) ){
+            return -1;
+        }
+        if( (dx1*dx1 + dy1*dy1) < (dx2*dx2 + dy2*dy2) ){
+            return 1;
+        }
+        return 0;
+    }
 private static int orientation(points p, points q, points r) {
     double val = (q.getY() - p.getY()) * (r.getX() - q.getX()) - (q.getX() - p.getX()) * (r.getY() - q.getY());
     if (val == 0) return 0;  // Collinear
