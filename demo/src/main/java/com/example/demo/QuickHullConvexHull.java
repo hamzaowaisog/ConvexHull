@@ -1,7 +1,11 @@
 package com.example.demo;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -12,6 +16,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -28,6 +33,7 @@ public class QuickHullConvexHull extends Application {
     long initialmemoryusage, finalmemoryusage, memorycomplexity;
     @Override
     public void start(Stage stage) throws Exception {
+        lines = new ArrayList<>();
         pane = new Pane();
         canvas = new Canvas(650, 500);
         gc = canvas.getGraphicsContext2D();
@@ -84,6 +90,7 @@ public class QuickHullConvexHull extends Application {
             pane.getChildren().remove(t10);
             pane.getChildren().remove(t12);
             points.clear();
+            lines.clear();
         });
 
         points = new ArrayList<>();
@@ -154,6 +161,53 @@ public class QuickHullConvexHull extends Application {
 
     }
 
+//    public void findConvexHull(ArrayList<points> points) {
+//        ArrayList<points> convexHull = new ArrayList<>();
+//        if (points.size() < 3){
+//            return;
+//        }
+//
+//
+//        int minPoint = -1, maxPoint = -1;
+//        double minX = Integer.MAX_VALUE;
+//        double maxX = Integer.MIN_VALUE;
+//        for (int i = 0; i < points.size(); i++) {
+//            if (points.get(i).getX() < minX) {
+//                minX = points.get(i).getX();
+//                minPoint = i;
+//            }
+//            if (points.get(i).getX() > maxX) {
+//                maxX = points.get(i).getX();
+//                maxPoint = i;
+//            }
+//        }
+//        points A = points.get(minPoint);
+//        points B = points.get(maxPoint);
+//        convexHull.add(A);
+//        convexHull.add(B);
+//        points.remove(A);
+//        points.remove(B);
+//
+//        ArrayList<points> leftSet = new ArrayList<>();
+//        ArrayList<points> rightSet = new ArrayList<>();
+//
+//        for (int i = 0; i < points.size(); i++) {
+//            points p = points.get(i);
+//            if (pointLocation(A, B, p) == -1)
+//                leftSet.add(p);
+//            else
+//                rightSet.add(p);
+//        }
+//        hullSet(A, B, rightSet, convexHull);
+//        hullSet(B, A, leftSet, convexHull);
+//
+//        for(int i=0 ; i<convexHull.size();i++){
+//            points p1 = convexHull.get(i);
+//            points p2 = convexHull.get((i+1)%convexHull.size());
+//            drawLine(p1,p2);
+//        }
+//    }
+
     public void findConvexHull(ArrayList<points> points) {
         ArrayList<points> convexHull = new ArrayList<>();
         if (points.size() < 3){
@@ -176,6 +230,8 @@ public class QuickHullConvexHull extends Application {
         }
         points A = points.get(minPoint);
         points B = points.get(maxPoint);
+        Line line = drawLine1(A,B);
+        lines.add(line);
         convexHull.add(A);
         convexHull.add(B);
         points.remove(A);
@@ -194,12 +250,64 @@ public class QuickHullConvexHull extends Application {
         hullSet(A, B, rightSet, convexHull);
         hullSet(B, A, leftSet, convexHull);
 
-        for(int i=0 ; i<convexHull.size();i++){
-            points p1 = convexHull.get(i);
-            points p2 = convexHull.get((i+1)%convexHull.size());
-            drawLine(p1,p2);
+        Timeline time = new Timeline();
+        time.setCycleCount(1);
+        time.setAutoReverse(false);
+        for(int i = 0 ; i <lines.size();i++){
+            Line l = lines.get(i);
+            time.getKeyFrames().add(new KeyFrame(Duration.seconds(i),actionEvent -> pane.getChildren().add(l)));
         }
+
+        time.setOnFinished(actionEvent -> {
+
+            PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
+            pause.setOnFinished(actionEvent1 -> {
+                for(Line l : lines){
+                    pane.getChildren().remove(l);
+                }
+            for(int i=0; i<convexHull.size();i++){
+                points p1 = convexHull.get(i);
+                points p2 = convexHull.get((i+1)%convexHull.size());
+                drawLine(p1,p2);
+            }
+            });
+            pause.play();
+
+        });
+
+        time.play();
+        finaltime = System.currentTimeMillis();
+        timecomplexity = finaltime - initialtime;
+        t4 = new Text(String.valueOf(finaltime)+" miliseconds");
+        t4.setX(200);
+        t4.setY(600);
+        pane.getChildren().add(t4);
+
+        t6 = new Text(String.valueOf(timecomplexity)+" miliseconds");
+        t6.setX(200);
+        t6.setY(675);
+        pane.getChildren().add(t6);
+
+        finalmemoryusage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        memorycomplexity = finalmemoryusage - initialmemoryusage;
+        t10 = new Text(String.valueOf(finalmemoryusage));
+        t10.setX(200);
+        t10.setY(825);
+        pane.getChildren().add(t10);
+
+        t12 = new Text(String.valueOf(memorycomplexity));
+        t12.setX(200);
+        t12.setY(900);
+        pane.getChildren().add(t12);
+
+
+//        for(int i=0 ; i<convexHull.size();i++){
+//            points p1 = convexHull.get(i);
+//            points p2 = convexHull.get((i+1)%convexHull.size());
+//            drawLine(p1,p2);
+//        }
     }
+
 
     public double distance(points A, points B, points C) {
         double ABx = B.getX() - A.getX();
@@ -210,6 +318,49 @@ public class QuickHullConvexHull extends Application {
         return num;
     }
 
+//    public void hullSet(points A, points B, ArrayList<points> set, ArrayList<points> hull) {
+//        int insertPosition = hull.indexOf(B);
+//        if (set.size() == 0)
+//            return;
+//        if (set.size() == 1) {
+//            points p = set.get(0);
+//            set.remove(p);
+//            hull.add(insertPosition, p);
+//            return;
+//        }
+//        double dist = Integer.MIN_VALUE;
+//        int furthestPoint = -1;
+//        for (int i = 0; i < set.size(); i++) {
+//            points p = set.get(i);
+//            double distance = distance(A, B, p);
+//            if (distance > dist) {
+//                dist = distance;
+//                furthestPoint = i;
+//            }
+//        }
+//        points P = set.get(furthestPoint);
+//        set.remove(furthestPoint);
+//        hull.add(insertPosition, P);
+//
+//        ArrayList<points> leftSetAP = new ArrayList<>();
+//        for (int i = 0; i < set.size(); i++) {
+//            points M = set.get(i);
+//            if (pointLocation(A, P, M) == 1) {
+//                leftSetAP.add(M);
+//            }
+//        }
+//
+//        ArrayList<points> leftSetPB = new ArrayList<>();
+//        for (int i = 0; i < set.size(); i++) {
+//            points M = set.get(i);
+//            if (pointLocation(P, B, M) == 1) {
+//                leftSetPB.add(M);
+//            }
+//        }
+//        hullSet(A, P, leftSetAP, hull);
+//        hullSet(P, B, leftSetPB, hull);
+//
+//    }
     public void hullSet(points A, points B, ArrayList<points> set, ArrayList<points> hull) {
         int insertPosition = hull.indexOf(B);
         if (set.size() == 0)
@@ -218,6 +369,12 @@ public class QuickHullConvexHull extends Application {
             points p = set.get(0);
             set.remove(p);
             hull.add(insertPosition, p);
+            Line l1 = drawLine1(A,B);
+            lines.add(l1);
+            Line l2 = drawLine1(A,p);
+            lines.add(l2);
+            Line l3 = drawLine1(B,p);
+            lines.add(l3);
             return;
         }
         double dist = Integer.MIN_VALUE;
@@ -233,6 +390,12 @@ public class QuickHullConvexHull extends Application {
         points P = set.get(furthestPoint);
         set.remove(furthestPoint);
         hull.add(insertPosition, P);
+        Line l1 = drawLine1(A,B);
+        lines.add(l1);
+        Line l2 = drawLine1(B,P);
+        lines.add(l2);
+        Line l4 = drawLine1(A,P);
+        lines.add(l4);
 
         ArrayList<points> leftSetAP = new ArrayList<>();
         for (int i = 0; i < set.size(); i++) {
@@ -253,7 +416,6 @@ public class QuickHullConvexHull extends Application {
         hullSet(P, B, leftSetPB, hull);
 
     }
-
     public double pointLocation(points A, points B, points P) {
         double cp1 = (B.getX() - A.getX()) * (P.getY() - A.getY()) - (B.getY() - A.getY()) * (P.getX() - A.getX());
         if (cp1 > 0)
@@ -264,9 +426,26 @@ public class QuickHullConvexHull extends Application {
             return -1;
     }
     private void drawLine(points p1, points p2) {
+        PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
+        pause.setOnFinished(event -> {
+            System.out.println("Drawing line from (" + p1.getX() + "," + p1.getY() + ") to (" + p2.getX() + "," + p2.getY() + ")");
+            gc.setStroke(Color.BLUE);
+            gc.setLineWidth(2);
+            gc.strokeLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+        });
+        pause.play();
+    }
+    private Line drawLine1(points p1, points p2) {
         System.out.println("Drawing line from (" + p1.getX() + "," + p1.getY() + ") to (" + p2.getX() + "," + p2.getY() + ")");
-        gc.setStroke(Color.BLUE);
+        gc.setStroke(Color.RED);
+        gc.setFill(Color.RED);
         gc.setLineWidth(2);
-        gc.strokeLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+
+        Line l = new Line(p1.getX(),p1.getY(),p2.getX(),p2.getY());
+        l.setStroke(Color.RED);
+        l.setFill(Color.RED);
+        l.setStrokeWidth(2);
+      //  gc.strokeLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+        return l;
     }
 }
