@@ -1,7 +1,12 @@
 package com.example.demo;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -12,16 +17,25 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 
 public class QuickEliminationConvexHull extends Application {
     ArrayList<points> points;
-    LinkedList<points> convexhull;
+    ArrayList<points> convexhull;
     ArrayList<Line> lines;
+    ArrayList<Line> lines2;
+    ArrayList<Line> lines3;
+    ArrayList<Line> lines4;
+    ArrayList<Line> lines5;
+    ArrayList<Circle> dots1;
+    ArrayList<Circle> dots2;
+    ArrayList<Circle> dots3;
+    ArrayList<Circle> dots4;
+    ArrayList<Circle> dots5;
     Pane pane;
     Canvas canvas;
     GraphicsContext gc;
@@ -32,6 +46,17 @@ public class QuickEliminationConvexHull extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         pane = new Pane();
+        lines = new ArrayList<>();
+        lines2 = new ArrayList<>();
+        lines3 = new ArrayList<>();
+        lines4 = new ArrayList<>();
+        lines5 = new ArrayList<>();
+        dots1 = new ArrayList<>();
+        dots2 = new ArrayList<>();
+        dots3 = new ArrayList<>();
+        dots4 = new ArrayList<>();
+        dots5 = new ArrayList<>();
+        convexhull = new ArrayList<>();
         canvas = new Canvas(650, 500);
         gc = canvas.getGraphicsContext2D();
         pane.getChildren().add(canvas);
@@ -337,10 +362,10 @@ public class QuickEliminationConvexHull extends Application {
         hull.add(findMaxX(points));
         hull.add(findMaxY(points));
 
-        drawLine(hull.get(0), hull.get(1));
-        drawLine(hull.get(1), hull.get(2));
-        drawLine(hull.get(2), hull.get(3));
-        drawLine(hull.get(3), hull.get(0));
+       lines.add(drawLine1(hull.get(0), hull.get(1)));
+       lines.add(drawLine1(hull.get(1), hull.get(2)));
+       lines.add(drawLine1(hull.get(2), hull.get(3)));
+       lines.add(drawLine1(hull.get(3), hull.get(0)));
 
         // all points are inside quad
         for(int i = 0 ; i < points.size() ; i++){
@@ -348,6 +373,8 @@ public class QuickEliminationConvexHull extends Application {
                 points.get(i).isOnHull = true;
             }
             points.get(i).flag = false;
+            Circle c1 = drawdots1(points.get(i));
+            dots1.add(c1);
         }
 
         // check if any point in region 1, remove it from quad
@@ -356,6 +383,13 @@ public class QuickEliminationConvexHull extends Application {
             if(points.get(i)!=hull.get(0) && points.get(i)!=hull.get(1)){
                 if(area(hull.get(0), hull.get(1), points.get(i))<0){
                     points.get(i).flag = true;
+                    points pointToRemove = points.get(i);
+                    for (int j = 0; j < dots1.size(); j++) {
+                        if ((dots1.get(j).getCenterX() == pointToRemove.getX()) && (dots1.get(j).getCenterY() == pointToRemove.getY())) {
+                            dots1.remove(j);
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -365,15 +399,29 @@ public class QuickEliminationConvexHull extends Application {
             if(points.get(i)!=hull.get(1) && points.get(i)!=hull.get(2)){
                 if(area(hull.get(1), hull.get(2), points.get(i))<0){
                     points.get(i).flag = true;
+                    points pointToRemove = points.get(i);
+                    for (int j = 0; j < dots1.size(); j++) {
+                        if ((dots1.get(j).getCenterX() == pointToRemove.getX()) && (dots1.get(j).getCenterY() == pointToRemove.getY())) {
+                            dots1.remove(j);
+                            break;
+                        }
+                    }
                 }
             }
         }
         // check if any point in region 3, remove it from quad
 
-        for(int i = 0 ; i < points.size() ; i++){
-            if(points.get(i)!=hull.get(2) && points.get(i)!=hull.get(3)){
-                if(area(hull.get(2), hull.get(3), points.get(i))<0){
+        for(int i = 0 ; i < points.size() ; i++) {
+            if (points.get(i) != hull.get(2) && points.get(i) != hull.get(3)) {
+                if (area(hull.get(2), hull.get(3), points.get(i)) < 0) {
                     points.get(i).flag = true;
+                    points pointToRemove = points.get(i);
+                    for (int j = 0; j < dots1.size(); j++) {
+                        if ((dots1.get(j).getCenterX() == pointToRemove.getX()) && (dots1.get(j).getCenterY() == pointToRemove.getY())) {
+                            dots1.remove(j);
+                            break;
+                            }
+                        }
                 }
             }
         }
@@ -383,6 +431,13 @@ public class QuickEliminationConvexHull extends Application {
             if(points.get(i)!=hull.get(3) && points.get(i)!=hull.get(0)){
                 if(area(hull.get(3), hull.get(0), points.get(i))<0){
                     points.get(i).flag = true;
+                    points pointToRemove = points.get(i);
+                    for (int j = 0; j < dots1.size(); j++) {
+                        if ((dots1.get(j).getCenterX() == pointToRemove.getX()) && (dots1.get(j).getCenterY() == pointToRemove.getY())) {
+                            dots1.remove(j);
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -450,6 +505,7 @@ public class QuickEliminationConvexHull extends Application {
                     jItr++;
                     j = region1.get(jItr);
                 }else{
+                    dots2.add(drawdots1(i));
                     region1.remove(i);
                     if(tempItr-1<0){
                         tempItr=0;
@@ -464,6 +520,9 @@ public class QuickEliminationConvexHull extends Application {
                 }
             }
             if(area(temp, i ,j )<0){
+                points p1 = i;
+                Circle c1 = drawdots1(p1);
+                dots2.add(c1);
                 region1.remove(i);
             }
         }
@@ -482,6 +541,7 @@ public class QuickEliminationConvexHull extends Application {
                     jItr++;
                     j = region2.get(jItr);
                 }else{
+                    dots3.add(drawdots1(i));
                     region2.remove(i);
                     if(tempItr-1<0){
                         tempItr=0;
@@ -496,6 +556,7 @@ public class QuickEliminationConvexHull extends Application {
                 }
             }
             if(area(temp, i, j)<0){
+                dots3.add(drawdots1(i));
                 region2.remove(i);
             }
         }
@@ -514,6 +575,7 @@ public class QuickEliminationConvexHull extends Application {
                     jItr++;
                     j = region3.get(jItr);
                 }else{
+                    dots4.add(drawdots1(i));
                     region3.remove(i);
                     if(tempItr-1<0){
                         tempItr=0;
@@ -528,6 +590,7 @@ public class QuickEliminationConvexHull extends Application {
                 }
             }
             if(area(temp, i, j)<0){
+                dots4.add(drawdots1(i));
                 region3.remove(i);
             }
         }
@@ -546,6 +609,7 @@ public class QuickEliminationConvexHull extends Application {
                     jItr++;
                     j = region4.get(jItr);
                 }else{
+                    dots5.add(drawdots1(i));
                     region4.remove(i);
                     if(tempItr-1<0){
                         tempItr=0;
@@ -560,31 +624,259 @@ public class QuickEliminationConvexHull extends Application {
                 }
             }
             if(area(temp, i, j)<0){
+                dots5.add(drawdots1(i));
                 region4.remove(i);
             }
         }
-
-
         for(int i=0;i<region1.size();i++){
-            points p1 = region1.get(i);
-            points p2 = region1.get((i+1)% region1.size());
-            drawLine(p1,p2);
-        }
-        for(int i=0;i< region2.size();i++){
-            points p1 = region2.get(i);
-            points p2 = region2.get((i+1)% region2.size());
-            drawLine(p1,p2);
-        }
-        for(int i=0;i<region3.size();i++){
-            points p1 = region3.get(i);
-            points p2 = region3.get((i+1)% region3.size());
-            drawLine(p1,p2);
-        }
-        for(int i=0;i<region4.size();i++){
-            points p1 = region4.get(i);
-            points p2 = region4.get((i+1)% region4.size());
-            drawLine(p1,p2);
-        }
+    points p1 = region1.get(i);
+    points p2 = region1.get((i+1)% region1.size());
+    lines2.add(drawLine1(p1,p2));
+}
+for(int i=0;i< region2.size();i++){
+    points p1 = region2.get(i);
+    points p2 = region2.get((i+1)% region2.size());
+    lines3.add(drawLine1(p1,p2));
+}
+for(int i=0;i<region3.size();i++){
+    points p1 = region3.get(i);
+    points p2 = region3.get((i+1)% region3.size());
+    lines4.add(drawLine1(p1,p2));
+}
+for(int i=0;i<region4.size();i++){
+    points p1 = region4.get(i);
+    points p2 = region4.get((i+1)% region4.size());
+    lines5.add(drawLine1(p1,p2));
+}
+
+
+        lines2.removeIf(line -> {
+            for (Line l : lines) {
+                if (areLinesEqual(l, line)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+// Remove elements in lines3 that are in lines
+        lines3.removeIf(line -> {
+            for (Line l : lines) {
+                if (areLinesEqual(l, line)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+// Remove elements in lines4 that are in lines
+        lines4.removeIf(line -> {
+            for (Line l : lines) {
+                if (areLinesEqual(l, line)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+// Remove elements in lines5 that are in lines
+        lines5.removeIf(line -> {
+            for (Line l : lines) {
+                if (areLinesEqual(l, line)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+
+        Timeline timeline = new Timeline();
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(10), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
+                pause.setOnFinished(actionEvent1 -> {
+                    for(Line l : lines){
+                        pane.getChildren().add(l);
+                    }
+                });
+                PauseTransition pause1 = new PauseTransition(Duration.seconds(1));
+                pause1.setOnFinished(actionEvent1 -> {
+                    for(Circle c : dots1){
+                        pane.getChildren().add(c);
+                    }
+                });
+                PauseTransition pause2 = new PauseTransition(Duration.seconds(1.5));
+                pause2.setOnFinished(actionEvent1 -> {
+                    for(Line l : lines2){
+                        pane.getChildren().add(l);
+                    }
+                });
+                PauseTransition pause3 = new PauseTransition(Duration.seconds(2));
+                pause3.setOnFinished(actionEvent1 -> {
+                    for(Circle c : dots2){
+                        pane.getChildren().add(c);
+                    }
+                });
+
+                PauseTransition pause4 = new PauseTransition(Duration.seconds(2.5));
+                pause4.setOnFinished(actionEvent1 -> {
+                    for(Line l : lines3){
+                        pane.getChildren().add(l);
+                    }
+                });
+                PauseTransition pause5 = new PauseTransition(Duration.seconds(3));
+                pause5.setOnFinished(actionEvent1 -> {
+                    for(Circle c : dots3){
+                        pane.getChildren().add(c);
+                    }
+                });
+
+                PauseTransition pause6 = new PauseTransition(Duration.seconds(3.5));
+                pause6.setOnFinished(actionEvent1 -> {
+                    for(Line l : lines4){
+                        pane.getChildren().add(l);
+                    }
+                });
+                PauseTransition pause7 = new PauseTransition(Duration.seconds(4));
+                pause7.setOnFinished(actionEvent1 -> {
+                    for(Circle c : dots4){
+                        pane.getChildren().add(c);
+                    }
+                });
+
+                PauseTransition pause8 = new PauseTransition(Duration.seconds(4.5));
+                pause8.setOnFinished(actionEvent1 -> {
+                    for(Line l : lines5){
+                        pane.getChildren().add(l);
+                    }
+                });
+                PauseTransition pause9 = new PauseTransition(Duration.seconds(5));
+                pause9.setOnFinished(actionEvent1 -> {
+                    for(Circle c : dots5){
+                        pane.getChildren().add(c);
+                    }
+                });
+
+                pause.play();
+                pause1.play();
+                pause2.play();
+                pause3.play();
+                pause4.play();
+                pause5.play();
+                pause6.play();
+                pause7.play();
+                pause8.play();
+                pause9.play();
+            }
+        });
+
+        timeline.getKeyFrames().add(keyFrame);
+        timeline.setOnFinished(actionEvent -> {
+
+            PauseTransition pause = new PauseTransition(Duration.seconds(10));
+            pause.setOnFinished(actionEvent1 -> {
+                for(Circle c : dots5){
+                    pane.getChildren().remove(c);
+                }
+                for(Line l : lines5){
+                    pane.getChildren().remove(l);
+                }
+                for(Circle c : dots4){
+                    pane.getChildren().remove(c);
+                }
+                for(Line l : lines4){
+                    pane.getChildren().remove(l);
+                }
+                for(Circle c : dots3){
+                    pane.getChildren().remove(c);
+                }
+                for(Line l : lines3){
+                    pane.getChildren().remove(l);
+                }
+                for(Circle c : dots2){
+                    pane.getChildren().remove(c);
+                }
+                for(Line l : lines2){
+                    pane.getChildren().remove(l);
+                }
+                for(Circle c : dots1){
+                    pane.getChildren().remove(c);
+                }
+                for(Line l : lines){
+                    pane.getChildren().remove(l);
+                }
+            });
+
+            PauseTransition pauseTransition = new PauseTransition(Duration.seconds(15));
+            pauseTransition.setOnFinished(actionEvent1 -> {
+                for(Line l : lines2){
+                    l.setStroke(Color.BLUE);
+                    pane.getChildren().add(l);
+                }
+                for(Line l : lines3){
+                    l.setStroke(Color.BLUE);
+                    pane.getChildren().add(l);
+                }
+                for(Line l : lines4){
+                    l.setStroke(Color.BLUE);
+                    pane.getChildren().add(l);
+                }
+                for(Line l : lines5){
+                    l.setStroke(Color.BLUE);
+                    pane.getChildren().add(l);
+                }
+
+
+            });
+            pause.play();
+            pauseTransition.play();
+        });
+        timeline.play();
+        finaltime = System.currentTimeMillis();
+        timecomplexity = finaltime - initialtime;
+        t4 = new Text(String.valueOf(finaltime)+" miliseconds");
+        t4.setX(200);
+        t4.setY(600);
+        pane.getChildren().add(t4);
+
+        t6 = new Text(String.valueOf(timecomplexity)+" miliseconds");
+        t6.setX(200);
+        t6.setY(675);
+        pane.getChildren().add(t6);
+
+        finalmemoryusage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        memorycomplexity = finalmemoryusage - initialmemoryusage;
+        t10 = new Text(String.valueOf(finalmemoryusage));
+        t10.setX(200);
+        t10.setY(825);
+        pane.getChildren().add(t10);
+
+        t12 = new Text(String.valueOf(memorycomplexity));
+        t12.setX(200);
+        t12.setY(900);
+        pane.getChildren().add(t12);
+//
+//        for(int i=0;i<region1.size();i++){
+//            points p1 = region1.get(i);
+//            points p2 = region1.get((i+1)% region1.size());
+//            drawLine(p1,p2);
+//        }
+//        for(int i=0;i< region2.size();i++){
+//            points p1 = region2.get(i);
+//            points p2 = region2.get((i+1)% region2.size());
+//            drawLine(p1,p2);
+//        }
+//        for(int i=0;i<region3.size();i++){
+//            points p1 = region3.get(i);
+//            points p2 = region3.get((i+1)% region3.size());
+//            drawLine(p1,p2);
+//        }
+//        for(int i=0;i<region4.size();i++){
+//            points p1 = region4.get(i);
+//            points p2 = region4.get((i+1)% region4.size());
+//            drawLine(p1,p2);
+//        }
 
 //        for (int k = 0; k < region1.size(); k++) {
 //            System.out.print(region1.get(k).name + " ");
@@ -599,18 +891,18 @@ public class QuickEliminationConvexHull extends Application {
 //            System.out.print(region4.get(k).name + " ");
 //        }
     }
+
+    private boolean areLinesEqual(Line line1, Line line2) {
+        return (line1.getStartX() == line2.getStartX() && line1.getStartY() == line2.getStartY() &&
+                line1.getEndX() == line2.getEndX() && line1.getEndY() == line2.getEndY()) ||
+                (line1.getStartX() == line2.getEndX() && line1.getStartY() == line2.getEndY() &&
+                        line1.getEndX() == line2.getStartX() && line1.getEndY() == line2.getStartY()) ||
+                (line1.getStartX() == line2.getEndX() && line1.getStartY() == line2.getEndY() &&
+                        line1.getEndX() == line2.getStartX() && line1.getEndY() == line2.getStartY());
+    }
     private double area(points a, points b, points c){
         return ((b.getX()-a.getX())*(c.getY()-a.getY()))-((b.getY()-a.getY())*(c.getX()-a.getX()));
     }
-
-
-public boolean isPointOnLineSegment(points p, points q, points r) {
-    if (q.getX() <= Math.max(p.getX(), r.getX()) && q.getX() >= Math.min(p.getX(), r.getX()) &&
-        q.getY() <= Math.max(p.getY(), r.getY()) && q.getY() >= Math.min(p.getY(), r.getY())) {
-        return true;
-    }
-    return false;
-}
 
     public boolean isPointWithinCanvas (points point){
         double canvasWidth = canvas.getWidth();
@@ -648,6 +940,27 @@ public boolean isPointOnLineSegment(points p, points q, points r) {
         gc.setLineWidth(2);
         gc.strokeLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
     }
+
+    private Line drawLine1(points p1, points p2) {
+        System.out.println("Drawing line from (" + p1.getX() + "," + p1.getY() + ") to (" + p2.getX() + "," + p2.getY() + ")");
+        gc.setStroke(Color.BLUE);
+        gc.setFill(Color.BLUE);
+        gc.setLineWidth(2);
+
+        Line l = new Line(p1.getX(),p1.getY(),p2.getX(),p2.getY());
+        l.setStroke(Color.RED);
+        l.setFill(Color.RED);
+        l.setStrokeWidth(2);
+        //  gc.strokeLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+        return l;
+    }
+    private Circle drawdots1(points p){
+        Circle dots = new Circle(p.getX(),p.getY(),5);
+        dots.setStroke(Color.BLUE);
+        dots.setFill(Color.BLUE);
+        return dots;
+    }
+
     public static void main(String[] args) {
         launch();
     }
