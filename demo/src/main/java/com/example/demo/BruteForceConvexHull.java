@@ -1,10 +1,8 @@
 package com.example.demo;
 
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.PauseTransition;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -21,6 +19,7 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class BruteForceConvexHull extends Application {
     ArrayList <points> points ;
@@ -264,48 +263,7 @@ public class BruteForceConvexHull extends Application {
 //        pane.getChildren().add(t12);
 //}
     boolean shouldContinue=true;
-    public void findConvexHull(ArrayList<points> points){
-    ArrayList<points> convexhull = new ArrayList<>();
-    Timeline timeline = new Timeline();
-    timeline.setCycleCount(Animation.INDEFINITE);
 
-    for(int i = 0 ; i < points.size() ; i++){
-        for (int j = 0 ; j < points.size() ; j++){
-            if(points.get(i)!=points.get(j)){
-                for(int k = 0 ; k < points.size() ; k++){
-                    shouldContinue = true;
-                    if(points.get(k) != points.get(j) && points.get(k)!=points.get(i)){
-                        lines.add(drawline1(points.get(i),points.get(j)));
-                        lines.add(drawline1(points.get(j),points.get(k)));
-
-                        if(ccwSlope(points.get(i),points.get(j),points.get(k))==-1){
-                            shouldContinue = false;
-                        }
-                        if(!shouldContinue){
-                            for(Line l : lines){
-                                pane.getChildren().remove(l);
-                            }
-                            break;
-                        }
-                    }
-                }
-                if(shouldContinue){
-                    points p1 = new points(points.get(i).getX(),points.get(i).getY());
-                    points p2 = new points(points.get(j).getX(),points.get(j).getY());
-
-                    KeyFrame keyFrame = new KeyFrame(Duration.seconds(i * 0.5), new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            drawLine(p1, p2);
-                        }
-                    });
-                    timeline.getKeyFrames().add(keyFrame);
-                }
-            }
-        }
-    }
-    timeline.play();
-}
 //    public void findConvexHull(ArrayList<points> points){
 //        ArrayList<points> convexhull = new ArrayList<>();
 //        for(int i = 0 ; i < points.size() ; i++){
