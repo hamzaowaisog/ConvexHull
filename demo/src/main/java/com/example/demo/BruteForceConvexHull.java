@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
@@ -34,6 +35,7 @@ public class BruteForceConvexHull extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         pane = new Pane();
+        lines = new ArrayList<>();
         canvas = new Canvas(650, 500);
         gc = canvas.getGraphicsContext2D();
         pane.getChildren().add(canvas);
@@ -262,6 +264,48 @@ public class BruteForceConvexHull extends Application {
 //        pane.getChildren().add(t12);
 //}
     boolean shouldContinue=true;
+    public void findConvexHull(ArrayList<points> points){
+    ArrayList<points> convexhull = new ArrayList<>();
+    Timeline timeline = new Timeline();
+    timeline.setCycleCount(Animation.INDEFINITE);
+
+    for(int i = 0 ; i < points.size() ; i++){
+        for (int j = 0 ; j < points.size() ; j++){
+            if(points.get(i)!=points.get(j)){
+                for(int k = 0 ; k < points.size() ; k++){
+                    shouldContinue = true;
+                    if(points.get(k) != points.get(j) && points.get(k)!=points.get(i)){
+                        lines.add(drawline1(points.get(i),points.get(j)));
+                        lines.add(drawline1(points.get(j),points.get(k)));
+
+                        if(ccwSlope(points.get(i),points.get(j),points.get(k))==-1){
+                            shouldContinue = false;
+                        }
+                        if(!shouldContinue){
+                            for(Line l : lines){
+                                pane.getChildren().remove(l);
+                            }
+                            break;
+                        }
+                    }
+                }
+                if(shouldContinue){
+                    points p1 = new points(points.get(i).getX(),points.get(i).getY());
+                    points p2 = new points(points.get(j).getX(),points.get(j).getY());
+
+                    KeyFrame keyFrame = new KeyFrame(Duration.seconds(i * 0.5), new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            drawLine(p1, p2);
+                        }
+                    });
+                    timeline.getKeyFrames().add(keyFrame);
+                }
+            }
+        }
+    }
+    timeline.play();
+}
 //    public void findConvexHull(ArrayList<points> points){
 //        ArrayList<points> convexhull = new ArrayList<>();
 //        for(int i = 0 ; i < points.size() ; i++){
@@ -291,64 +335,7 @@ public class BruteForceConvexHull extends Application {
 //                }
 //            }
 //        }
-//    }
-public void findConvexHull(ArrayList<points> points){
-    ArrayList<points> convexhull = new ArrayList<>();
-
-    for(int i = 0 ; i < points.size() ; i++){
-        for (int j = 0 ; j < points.size() ; j++){
-            if(points.get(i)!=points.get(j)){
-                for(int k = 0 ; k < points.size() ; k++){
-                    shouldContinue = true;
-                    if(points.get(k) != points.get(j) && points.get(k)!=points.get(i)){
-                        PauseTransition pause = new PauseTransition(Duration.seconds(k * 0.5));
-                        int finalI = i;
-                        int finalJ = j;
-                        int finalK = k;
-                        pause.setOnFinished(event -> {
-                            if(ccwSlope(points.get(finalI),points.get(finalJ),points.get(finalK))==-1){
-                                changeColor(points.get(finalK), Color.BLUE);
-                                shouldContinue = false;
-                            } else {
-                                changeColor(points.get(finalK), Color.BLACK);
-                            }
-                            PauseTransition pauseBack = new PauseTransition(Duration.seconds(0.5));
-                            pauseBack.setOnFinished(eventBack -> changeColor(points.get(finalK), Color.RED));
-                            pauseBack.play();
-                        });
-                        pause.play();
-                        if(!shouldContinue){
-                            break;
-                        }
-                    }
-                }
-            }
-            if(shouldContinue){
-                points p1 = new points(points.get(i).getX(),points.get(i).getY());
-                points p2 = new points(points.get(j).getX(),points.get(j).getY());
-                convexhull.add(p1);
-                convexhull.add(p2);
-            }
-        }
-    }
-        Timeline timeline = new Timeline();
-    // For each pair of points in the convex hull
-    for (int i = 0; i < convexhull.size() - 1; i += 2) {
-        points p1 = convexhull.get(i);
-        points p2 = convexhull.get(i + 1);
-
-        // Create a keyframe that draws a line between the two points
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(i * 0.5), e -> drawLine(p1, p2));
-
-        // Add the keyframe to the timeline
-        timeline.getKeyFrames().add(keyFrame);
-    }
-
-    // Play the timeline
-    timeline.play();
-
-    // Rest of your code...
-}
+//   }
 
     public void changeColor(points p, Color color) {
         Circle circle = new Circle(p.getX(), p.getY(), 5);
@@ -434,5 +421,12 @@ private static int orientation(points p, points q, points r) {
         gc.setStroke(Color.BLUE);
         gc.setLineWidth(2);
         gc.strokeLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+    }
+    public Line drawline1(points p1,points p2){
+        Line l1 = new Line(p1.getX(),p1.getY(),p2.getX(),p2.getY());
+        l1.setStroke(Color.RED);
+        pane.getChildren().add(l1);
+        return l1;
+
     }
 }
