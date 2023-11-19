@@ -1,6 +1,8 @@
 package com.example.demo;
 
 public class points {
+    public boolean isOnHull;
+    public boolean flag;
     private double x;
     private double y;
 
@@ -13,7 +15,7 @@ public class points {
     }
 
     public double getX() {
-        return x;
+        return this.x;
     }
 
     public void setX(double x) {
@@ -21,7 +23,7 @@ public class points {
     }
 
     public double getY() {
-        return y;
+        return this.y;
     }
 
     public void setY(double y) {

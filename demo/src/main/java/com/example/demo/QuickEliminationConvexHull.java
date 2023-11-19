@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 public class QuickEliminationConvexHull extends Application {
@@ -131,128 +132,477 @@ public class QuickEliminationConvexHull extends Application {
 
     }
 
+//    public void findConvexHull(ArrayList<points> points){
+//        int n = points.size();
+//
+//        if(n<3){
+//            return;
+//        }
+//
+//        points leftmost,rightmost,upmost,downmost;
+//        int left=0;
+//        int right =0;
+//        int up=0;
+//        int down =0;
+//        for(int i =0 ; i< n ; i++){
+//            if(points.get(i).getX()<points.get(left).getX() || (points.get(i).getX() == points.get(left).getX() && points.get(i).getY()>points.get(left).getY())){
+//                left =i;
+//            }
+//        }
+//        leftmost = points.get(left);
+//        for(int i =0 ; i< n ; i++){
+//            if(points.get(i).getX()>points.get(right).getX() || (points.get(i).getX() == points.get(right).getX() && points.get(i).getY()<points.get(right).getY())){
+//                right =i;
+//            }
+//        }
+//        rightmost = points.get(right);
+//        for(int i =0 ; i< n ; i++){
+//            if(points.get(i).getY()<points.get(down).getY() || (points.get(i).getY() == points.get(down).getY() && points.get(i).getX()>points.get(down).getX())){
+//                down =i;
+//            }
+//        }
+//        downmost = points.get(down);
+//        for(int i =0 ; i< n ; i++){
+//            if(points.get(i).getY()>points.get(up).getY() || (points.get(i).getY() == points.get(up).getY() && points.get(i).getX()>points.get(up).getX())){
+//                up =i;
+//            }
+//        }
+//        upmost = points.get(up);
+//
+//        drawLine(leftmost,upmost);
+//        drawLine(upmost,rightmost);
+//        drawLine(rightmost,downmost);
+//        drawLine(downmost,leftmost);
+//
+//        ArrayList <points> inside = new ArrayList<>();
+//        ArrayList <points> outside = new ArrayList<>();
+//        ArrayList<Circle> insidedots = new ArrayList<>();
+//        ArrayList<points> polygon = new ArrayList<>();
+//        polygon.add(upmost);
+//        polygon.add(downmost);
+//        polygon.add(rightmost);
+//        polygon.add(leftmost);
+//        for(points point : points){
+//            if(point != upmost && point!= rightmost && point != leftmost && point != downmost) {
+//                if (isPointInsidePolygon(point, polygon)) {
+//                    inside.add(point);
+//                    System.out.println("Points inside the polygons "+point.getX()+" "+point.getY());
+//                } else {
+//                    outside.add(point);
+//                    System.out.println("Points outside the polygons "+point.getX()+" "+point.getY());
+//                }
+//            }
+//        }
+//
+//        for(points inner : inside){
+//            Circle dots = new Circle(inner.getX(),inner.getY(),5);
+//            dots.setStroke(Color.BLUE);
+//            pane.getChildren().add(dots);
+//            insidedots.add(dots);
+//
+//        }
+//
+//
+//    }
+//public boolean isPointInsidePolygon(points point, ArrayList<points> polygon) {
+//    int n = polygon.size();
+//    int intersectCount = 0;
+//    double epsilon = 1e-20;
+//
+//    for (int i = 0; i < n; i++) {
+//        points p1 = polygon.get(i);
+//        points p2 = polygon.get((i + 1) % n);
+//
+//        // Check if the point is on the edge
+//        if (isPointOnLineSegment(p1, point, p2)) {
+//            return true;
+//        }
+//
+//        // Check if the ray crosses the edge
+//        if ((p1.getY() < point.getY()) != (p2.getY() < point.getY())) {
+//            double intersectX = p1.getX() + (point.getY() - p1.getY()) * (p2.getX() - p1.getX()) / (p2.getY() - p1.getY());
+//
+//            // Check if the ray intersects with a vertex
+//            if (Math.abs(intersectX - point.getX()) < epsilon) {
+//                if ((p1.getY() < point.getY() && p2.getY() > point.getY()) || (p1.getY() > point.getY() && p2.getY() < point.getY())) {
+//                    intersectCount += 2;
+//                } else {
+//                    intersectCount++;
+//                }
+//            } else if (intersectX > point.getX()) {
+//                intersectCount++;
+//            }
+//        }
+//    }
+//    return intersectCount % 2 == 1;
+//}
+//
+//public boolean doIntersect(points p1, points q1, points p2, points q2) {
+//    int o1 = orientation(p1, q1, p2);
+//    int o2 = orientation(p1, q1, q2);
+//    int o3 = orientation(p2, q2, p1);
+//    int o4 = orientation(p2, q2, q1);
+//
+//    if (o1 != o2 && o3 != o4) {
+//        return true;
+//    }
+//
+//    if (o1 == 0 && isPointOnLineSegment(p1, p2, q1)) return true;
+//    if (o2 == 0 && isPointOnLineSegment(p1, q2, q1)) return true;
+//    if (o3 == 0 && isPointOnLineSegment(p2, p1, q2)) return true;
+//    if (o4 == 0 && isPointOnLineSegment(p2, q1, q2)) return true;
+//
+//    return false;
+//}
+
+
+     points temp;
+     points i;
+     points j;
+     double maxY;
+     int maxYIdx = -1;
+     points maxYPoint;
+    private points findMaxY(ArrayList<points> points) {
+        maxY = points.get(0).getY();
+        maxYIdx = 0;
+        maxYPoint = points.get(0);
+        for (int i = 1; i < points.size(); i++) {
+            if (points.get(i).getY() > maxY) {
+                maxY = points.get(i).getY();
+                maxYIdx = i;
+                maxYPoint = points.get(i);
+            }
+        }
+        return maxYPoint;
+    }
+     double minY;
+     int minYIdx = -1;
+     points minYPoint;
+    private points findMinY(ArrayList<points> points) {
+        minY = points.get(0).getY();
+        minYIdx = 0;
+        minYPoint = points.get(0);
+        for (int i = 1; i < points.size(); i++) {
+            if (points.get(i).getY() < minY) {
+                minY = points.get(i).getY();
+                minYIdx = i;
+                minYPoint = points.get(i);
+            }
+        }
+        return minYPoint;
+    }
+     double maxX;
+     int maxXIdx = -1;
+    points maxXPoint;
+    private points findMaxX(ArrayList<points> points) {
+        maxX = points.get(0).getX();
+        maxXIdx = 0;
+        maxXPoint = points.get(0);
+        for (int i = 1; i < points.size(); i++) {
+            if (points.get(i).getX() > maxX) {
+                maxX = points.get(i).getX();
+                maxXIdx = i;
+                maxXPoint = points.get(i);
+            }
+        }
+        return maxXPoint;
+    }
+    double minX;
+    int minXIdx = -1;
+    points minXPoint;
+    private points findMinX(ArrayList<points> points) {
+        minX = points.get(0).getX();
+        minXIdx = 0;
+        minXPoint = points.get(0);
+        for (int i = 1; i < points.size(); i++) {
+            if (points.get(i).getX() < minX) {
+                minX = points.get(i).getX();
+                minXIdx = i;
+                minXPoint = points.get(i);
+            }
+        }
+        return minXPoint;
+    }
+     ArrayList<points> hull = new ArrayList<>();
+     ArrayList<points> region1 = new ArrayList<>();
+     ArrayList<points> region2 = new ArrayList<>();
+     ArrayList<points> region3 = new ArrayList<>();
+     ArrayList<points> region4 = new ArrayList<>();
+     int jItr;
+     int tempItr;
+
     public void findConvexHull(ArrayList<points> points){
-        int n = points.size();
+        hull.add(findMinX(points));
+        hull.add(findMinY(points));
+        hull.add(findMaxX(points));
+        hull.add(findMaxY(points));
 
-        if(n<3){
-            return;
+        drawLine(hull.get(0), hull.get(1));
+        drawLine(hull.get(1), hull.get(2));
+        drawLine(hull.get(2), hull.get(3));
+        drawLine(hull.get(3), hull.get(0));
+
+        // all points are inside quad
+        for(int i = 0 ; i < points.size() ; i++){
+            if(hull.contains(points.get(i))) {
+                points.get(i).isOnHull = true;
+            }
+            points.get(i).flag = false;
         }
 
-        points leftmost,rightmost,upmost,downmost;
-        int left=0;
-        int right =0;
-        int up=0;
-        int down =0;
-        for(int i =0 ; i< n ; i++){
-            if(points.get(i).getX()<points.get(left).getX() || (points.get(i).getX() == points.get(left).getX() && points.get(i).getY()>points.get(left).getY())){
-                left =i;
+        // check if any point in region 1, remove it from quad
+
+        for(int i = 0 ; i < points.size() ; i++){
+            if(points.get(i)!=hull.get(0) && points.get(i)!=hull.get(1)){
+                if(area(hull.get(0), hull.get(1), points.get(i))<0){
+                    points.get(i).flag = true;
+                }
             }
         }
-        leftmost = points.get(left);
-        for(int i =0 ; i< n ; i++){
-            if(points.get(i).getX()>points.get(right).getX() || (points.get(i).getX() == points.get(right).getX() && points.get(i).getY()<points.get(right).getY())){
-                right =i;
-            }
-        }
-        rightmost = points.get(right);
-        for(int i =0 ; i< n ; i++){
-            if(points.get(i).getY()<points.get(down).getY() || (points.get(i).getY() == points.get(down).getY() && points.get(i).getX()>points.get(down).getX())){
-                down =i;
-            }
-        }
-        downmost = points.get(down);
-        for(int i =0 ; i< n ; i++){
-            if(points.get(i).getY()>points.get(up).getY() || (points.get(i).getY() == points.get(up).getY() && points.get(i).getX()>points.get(up).getX())){
-                up =i;
-            }
-        }
-        upmost = points.get(up);
+        // check if any point in region 2, remove it from quad
 
-        drawLine(leftmost,upmost);
-        drawLine(upmost,rightmost);
-        drawLine(rightmost,downmost);
-        drawLine(downmost,leftmost);
+        for(int i = 0 ; i < points.size() ; i++){
+            if(points.get(i)!=hull.get(1) && points.get(i)!=hull.get(2)){
+                if(area(hull.get(1), hull.get(2), points.get(i))<0){
+                    points.get(i).flag = true;
+                }
+            }
+        }
+        // check if any point in region 3, remove it from quad
 
-        ArrayList <points> inside = new ArrayList<>();
-        ArrayList <points> outside = new ArrayList<>();
-        ArrayList<Circle> insidedots = new ArrayList<>();
-        ArrayList<points> polygon = new ArrayList<>();
-        polygon.add(upmost);
-        polygon.add(downmost);
-        polygon.add(rightmost);
-        polygon.add(leftmost);
-        for(points point : points){
-            if(point != upmost && point!= rightmost && point != leftmost && point != downmost) {
-                if (isPointInsidePolygon(point, polygon)) {
-                    inside.add(point);
-                    System.out.println("Points inside the polygons "+point.getX()+" "+point.getY());
-                } else {
-                    outside.add(point);
-                    System.out.println("Points outside the polygons "+point.getX()+" "+point.getY());
+        for(int i = 0 ; i < points.size() ; i++){
+            if(points.get(i)!=hull.get(2) && points.get(i)!=hull.get(3)){
+                if(area(hull.get(2), hull.get(3), points.get(i))<0){
+                    points.get(i).flag = true;
+                }
+            }
+        }
+        // check if any point in region 4, remove it from quad
+
+        for(int i = 0 ; i < points.size() ; i++){
+            if(points.get(i)!=hull.get(3) && points.get(i)!=hull.get(0)){
+                if(area(hull.get(3), hull.get(0), points.get(i))<0){
+                    points.get(i).flag = true;
                 }
             }
         }
 
-        for(points inner : inside){
-            Circle dots = new Circle(inner.getX(),inner.getY(),5);
-            dots.setStroke(Color.BLUE);
-            pane.getChildren().add(dots);
-            insidedots.add(dots);
+        //points getting removed from region ALL RIGHT
 
-        }
-
-
-    }
-public boolean isPointInsidePolygon(points point, ArrayList<points> polygon) {
-    int n = polygon.size();
-    int intersectCount = 0;
-    double epsilon = 1e-20;
-
-    for (int i = 0; i < n; i++) {
-        points p1 = polygon.get(i);
-        points p2 = polygon.get((i + 1) % n);
-
-        // Check if the point is on the edge
-        if (isPointOnLineSegment(p1, point, p2)) {
-            return true;
-        }
-
-        // Check if the ray crosses the edge
-        if ((p1.getY() < point.getY()) != (p2.getY() < point.getY())) {
-            double intersectX = p1.getX() + (point.getY() - p1.getY()) * (p2.getX() - p1.getX()) / (p2.getY() - p1.getY());
-
-            // Check if the ray intersects with a vertex
-            if (Math.abs(intersectX - point.getX()) < epsilon) {
-                if ((p1.getY() < point.getY() && p2.getY() > point.getY()) || (p1.getY() > point.getY() && p2.getY() < point.getY())) {
-                    intersectCount += 2;
-                } else {
-                    intersectCount++;
-                }
-            } else if (intersectX > point.getX()) {
-                intersectCount++;
+        // add to region 1 array
+        region1.add(hull.get(0));
+        region1.add(hull.get(1));
+        for (int i = 0; i < points.size(); i++) {
+            if( points.get(i)!=region1.get(0) && points.get(i)!=region1.get(1) && points.get(i).flag && area(region1.get(0),region1.get(1), points.get(i))<0 ){
+                region1.add(points.get(i));
             }
         }
+        region1.sort(Comparator.comparingDouble(com.example.demo.points::getX));
+
+
+
+        // add to region 2 array
+        region2.add(hull.get(1));
+        region2.add(hull.get(2));
+        for (int i = 0; i < points.size(); i++) {
+            if( points.get(i)!=region1.get(0) && points.get(i)!=region2.get(1) && points.get(i).flag && area(region2.get(0), region2.get(1), points.get(i))<0 ){
+                region2.add(points.get(i));
+            }
+        }
+        region2.sort(Comparator.comparingDouble(com.example.demo.points::getX));
+
+
+        // add to region 3 array
+        region3.add(hull.get(2));
+        region3.add(hull.get(3));
+        for (int i = 0; i < points.size(); i++) {
+            if( points.get(i)!=region3.get(0) && points.get(i)!=region3.get(1) && points.get(i).flag && area(region3.get(0), region3.get(1), points.get(i))<0 ){
+                region3.add(points.get(i));
+            }
+        }
+        region3.sort(Comparator.comparingDouble(com.example.demo.points::getX).reversed());
+
+
+        // add to region 4 array
+        region4.add(hull.get(3));
+        region4.add(hull.get(0));
+        for (int i = 0; i < points.size(); i++) {
+            if( points.get(i)!=region4.get(0) && points.get(i)!=region4.get(1) && points.get(i).flag && area(region4.get(0), region4.get(1), points.get(i))<0 ){
+                region4.add(points.get(i));
+            }
+        }
+        region4.sort(Comparator.comparingDouble(com.example.demo.points::getX).reversed());
+
+        // REGIONS ALL RIGHT
+
+        //get hull of region1
+        if(region1.size()>3){
+            jItr = 2;
+            tempItr=0;
+            temp = region1.get(tempItr);
+            i = region1.get(1);
+            j = region1.get(jItr);
+            while(j != region1.get(region1.size()-1)){
+                if(area(temp, i ,j)>=0){
+                    tempItr++;
+                    temp = region1.get(tempItr);
+                    i = j;
+                    jItr++;
+                    j = region1.get(jItr);
+                }else{
+                    region1.remove(i);
+                    if(tempItr-1<0){
+                        tempItr=0;
+                        i=j;
+                        j=region1.get(jItr);
+                    }else{
+                        jItr--;
+                        i = region1.get(tempItr);
+                        tempItr--;
+                        temp = region1.get(tempItr);
+                    }
+                }
+            }
+            if(area(temp, i ,j )<0){
+                region1.remove(i);
+            }
+        }
+        //get hull of region2
+        if(region2.size()>3){
+            jItr = 2;
+            tempItr=0;
+            temp = region2.get(tempItr);
+            i = region2.get(1);
+            j = region2.get(jItr);
+            while(j != region2.get(region2.size()-1)){
+                if(area(temp, i ,j)>=0){
+                    tempItr++;
+                    temp = region2.get(tempItr);
+                    i = j;
+                    jItr++;
+                    j = region2.get(jItr);
+                }else{
+                    region2.remove(i);
+                    if(tempItr-1<0){
+                        tempItr=0;
+                        i=j;
+                        j=region2.get(jItr);
+                    }else{
+                        jItr--;
+                        i = region2.get(tempItr);
+                        tempItr--;
+                        temp = region2.get(tempItr);
+                    }
+                }
+            }
+            if(area(temp, i, j)<0){
+                region2.remove(i);
+            }
+        }
+        //get hull of region3
+        if(region3.size()>3){
+            jItr = 2;
+            tempItr=0;
+            temp = region3.get(tempItr);
+            i = region3.get(1);
+            j = region3.get(jItr);
+            while(j != region3.get(region3.size()-1)){
+                if(area(temp, i ,j)>=0){
+                    tempItr++;
+                    temp = region3.get(tempItr);
+                    i = j;
+                    jItr++;
+                    j = region3.get(jItr);
+                }else{
+                    region3.remove(i);
+                    if(tempItr-1<0){
+                        tempItr=0;
+                        i=j;
+                        j=region3.get(jItr);
+                    }else{
+                        jItr--;
+                        i = region3.get(tempItr);
+                        tempItr--;
+                        temp = region3.get(tempItr);
+                    }
+                }
+            }
+            if(area(temp, i, j)<0){
+                region3.remove(i);
+            }
+        }
+        //get hull of region4
+        if(region4.size()>3){
+            jItr = 2;
+            tempItr=0;
+            temp = region4.get(tempItr);
+            i = region4.get(1);
+            j = region4.get(jItr);
+            while(j != region4.get(region4.size()-1)){
+                if(area(temp, i ,j)>=0){
+                    tempItr++;
+                    temp = region4.get(tempItr);
+                    i = j;
+                    jItr++;
+                    j = region4.get(jItr);
+                }else{
+                    region4.remove(i);
+                    if(tempItr-1<0){
+                        tempItr=0;
+                        i=j;
+                        j=region4.get(jItr);
+                    }else{
+                        jItr--;
+                        i = region4.get(tempItr);
+                        tempItr--;
+                        temp = region4.get(tempItr);
+                    }
+                }
+            }
+            if(area(temp, i, j)<0){
+                region4.remove(i);
+            }
+        }
+
+
+        for(int i=0;i<region1.size();i++){
+            points p1 = region1.get(i);
+            points p2 = region1.get((i+1)% region1.size());
+            drawLine(p1,p2);
+        }
+        for(int i=0;i< region2.size();i++){
+            points p1 = region2.get(i);
+            points p2 = region2.get((i+1)% region2.size());
+            drawLine(p1,p2);
+        }
+        for(int i=0;i<region3.size();i++){
+            points p1 = region3.get(i);
+            points p2 = region3.get((i+1)% region3.size());
+            drawLine(p1,p2);
+        }
+        for(int i=0;i<region4.size();i++){
+            points p1 = region4.get(i);
+            points p2 = region4.get((i+1)% region4.size());
+            drawLine(p1,p2);
+        }
+
+//        for (int k = 0; k < region1.size(); k++) {
+//            System.out.print(region1.get(k).name + " ");
+//        }
+//        for (int k = 0; k < region2.size(); k++) {
+//            System.out.print(region2.get(k).name + " ");
+//        }
+//        for (int k = 0; k < region3.size(); k++) {
+//            System.out.print(region3.get(k).name + " ");
+//        }
+//        for (int k = 0; k < region4.size(); k++) {
+//            System.out.print(region4.get(k).name + " ");
+//        }
     }
-    return intersectCount % 2 == 1;
-}
-
-public boolean doIntersect(points p1, points q1, points p2, points q2) {
-    int o1 = orientation(p1, q1, p2);
-    int o2 = orientation(p1, q1, q2);
-    int o3 = orientation(p2, q2, p1);
-    int o4 = orientation(p2, q2, q1);
-
-    if (o1 != o2 && o3 != o4) {
-        return true;
+    private double area(points a, points b, points c){
+        return ((b.getX()-a.getX())*(c.getY()-a.getY()))-((b.getY()-a.getY())*(c.getX()-a.getX()));
     }
 
-    if (o1 == 0 && isPointOnLineSegment(p1, p2, q1)) return true;
-    if (o2 == 0 && isPointOnLineSegment(p1, q2, q1)) return true;
-    if (o3 == 0 && isPointOnLineSegment(p2, p1, q2)) return true;
-    if (o4 == 0 && isPointOnLineSegment(p2, q1, q2)) return true;
-
-    return false;
-}
 
 public boolean isPointOnLineSegment(points p, points q, points r) {
     if (q.getX() <= Math.max(p.getX(), r.getX()) && q.getX() >= Math.min(p.getX(), r.getX()) &&
