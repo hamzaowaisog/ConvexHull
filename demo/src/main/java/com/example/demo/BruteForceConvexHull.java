@@ -20,17 +20,19 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Stack;
 
 public class BruteForceConvexHull extends Application {
-    ArrayList <points> points ;
+    ArrayList<points> points;
     ArrayList<Line> lines;
     Pane pane;
     Canvas canvas;
     GraphicsContext gc;
-    Text t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12;
+    Text t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12;
     Button b1;
-    long initialtime,finaltime,timecomplexity;
-    long initialmemoryusage,finalmemoryusage,memorycomplexity;
+    long initialtime, finaltime, timecomplexity;
+    long initialmemoryusage, finalmemoryusage, memorycomplexity;
+
     @Override
     public void start(Stage stage) throws Exception {
         pane = new Pane();
@@ -66,7 +68,7 @@ public class BruteForceConvexHull extends Application {
         t11.setX(10);
         t11.setY(900);
 
-        b1= new Button("Run");
+        b1 = new Button("Run");
         b1.setLayoutX(300);
         b1.setLayoutY(950);
         b1.setPrefWidth(90);
@@ -83,7 +85,7 @@ public class BruteForceConvexHull extends Application {
             pane.getChildren().removeIf(node -> node instanceof Circle || node instanceof Text && "dots".equals(node.getId()));
             pane.getChildren().removeIf(node -> node instanceof Line);
             lines.clear();
-            gc.clearRect(0,0, canvas.getWidth(),canvas.getHeight());
+            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
             pane.getChildren().remove(t2);
             pane.getChildren().remove(t4);
             pane.getChildren().remove(t6);
@@ -99,10 +101,10 @@ public class BruteForceConvexHull extends Application {
             double y = event.getY();
 
 
-            points p = new points(x,y);
+            points p = new points(x, y);
             if (isPointWithinCanvas(p)) {
-                points.add(new points(x,y));
-                givedotscordinates(points, "p" + points.size(),points.size()-1);
+                points.add(new points(x, y));
+                givedotscordinates(points, "p" + points.size(), points.size() - 1);
             }
         });
 
@@ -119,10 +121,11 @@ public class BruteForceConvexHull extends Application {
         stage.show();
 
     }
-    public void run(ActionEvent event){
+
+    public void run(ActionEvent event) {
         initialmemoryusage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         initialtime = System.currentTimeMillis();
-        t2 = new Text(String.valueOf(initialtime)+" miliseconds");
+        t2 = new Text(String.valueOf(initialtime) + " miliseconds");
         t2.setX(200);
         t2.setY(525);
         pane.getChildren().add(t2);
@@ -131,7 +134,8 @@ public class BruteForceConvexHull extends Application {
         t8.setX(200);
         t8.setY(750);
         pane.getChildren().add(t8);
-        findConvexHull(points);
+        findConvexHull1(points);
+        //findConvexHull(points);
 //        points p0 = getLowestPoint(convexHull);
 //        convexHull.sort((p1,p2) -> comparePoints(p0,p1,p2));
 //        for (int i = 0; i < convexHull.size(); i++) {
@@ -142,6 +146,105 @@ public class BruteForceConvexHull extends Application {
 
 
     }
+    static boolean shouldContinue = true;
+    static Stack<Line> ij = new Stack<>();
+    static Stack<Line> jk = new Stack<>();
+    static Timeline tl = new Timeline();
+     static int i = 0, j = 0, k = 0;
+
+    private void findConvexHull1(ArrayList<com.example.demo.points> points) {
+        ArrayList<points> p1 = points;
+        tl.setCycleCount(Timeline.INDEFINITE);
+
+        KeyFrame kf = new KeyFrame(Duration.seconds(0.01), actionEvent -> {
+            if (points.get(i) != points.get(j)) {
+                drawLineIJ(points.get(i), points.get(j));
+                if (points.get(k) != points.get(j) && points.get(k) != points.get(i)) {
+                    drawLineJK(points.get(j), points.get(k));
+                    if (ccwSlope(points.get(i), points.get(j), points.get(k)) == 1) {
+                        pane.getChildren().remove(ij.pop());
+                        shouldContinue = false;
+                    }
+                    pane.getChildren().remove(jk.pop());
+                }
+                k++;
+                if (!shouldContinue) {
+                    j++;
+                    k = 0;
+                    shouldContinue = true;
+                }
+            } else {
+                j++;
+            }
+            if (k >= points.size() && shouldContinue) {
+                drawLineIJ(points.get(i), points.get(j));
+            }
+            if (k >= points.size()) {
+                j++;
+                k = 0;
+                shouldContinue = true;
+            }
+            if (j >= points.size()) {
+                i++;
+                j = 0;
+            }
+            if (i >= points.size()) {
+                tl.stop();
+            }
+        });
+        tl.getKeyFrames().add(kf);
+        tl.play();
+
+        finaltime = System.currentTimeMillis();
+        timecomplexity = finaltime - initialtime;
+        t4 = new Text(String.valueOf(finaltime)+" miliseconds");
+        t4.setX(200);
+        t4.setY(600);
+        pane.getChildren().add(t4);
+
+        t6 = new Text(String.valueOf(timecomplexity)+" miliseconds");
+        t6.setX(200);
+        t6.setY(675);
+        pane.getChildren().add(t6);
+
+        finalmemoryusage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        memorycomplexity = finalmemoryusage - initialmemoryusage;
+        t10 = new Text(String.valueOf(finalmemoryusage));
+        t10.setX(200);
+        t10.setY(825);
+        pane.getChildren().add(t10);
+
+        t12 = new Text(String.valueOf(memorycomplexity));
+        t12.setX(200);
+        t12.setY(900);
+        pane.getChildren().add(t12);
+    }
+
+    private void drawLineIJ(points a, points b) {
+        if(ij.isEmpty()){
+            Line l1 = new Line(a.getX(), a.getY(), b.getX(), b.getY());
+            l1.setStroke(Color.BLUE);
+            l1.setStrokeWidth(2);
+            pane.getChildren().add(l1);
+            ij.push(l1);
+        }
+        if((a.getX()!=ij.peek().getStartX() && a.getY()!=ij.peek().getStartY()) || (b.getX()!=ij.peek().getEndX() && b.getY()!=ij.peek().getEndY()) ){
+            Line l1 = new Line(a.getX(), a.getY(), b.getX(), b.getY());
+            l1.setStroke(Color.BLUE);
+            l1.setStrokeWidth(2);
+            pane.getChildren().add(l1);
+            ij.push(l1);
+        }
+    }
+    private void drawLineJK(points a, points b) {
+        Line l1 = new Line(a.getX(), a.getY(), b.getX(), b.getY());
+        l1.setStroke(Color.RED);
+        l1.setStrokeWidth(2);
+        pane.getChildren().add(l1);
+        jk.push(l1);
+    }
+
+
     public boolean isPointWithinCanvas(points point) {
     double canvasWidth = canvas.getWidth();
     double canvasHeight = canvas.getHeight();
@@ -262,7 +365,6 @@ public class BruteForceConvexHull extends Application {
 //        t12.setY(900);
 //        pane.getChildren().add(t12);
 //}
-    boolean shouldContinue=true;
 
 //    public void findConvexHull(ArrayList<points> points){
 //        ArrayList<points> convexhull = new ArrayList<>();
