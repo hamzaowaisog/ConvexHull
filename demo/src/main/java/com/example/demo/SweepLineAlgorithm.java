@@ -146,6 +146,22 @@ public class SweepLineAlgorithm extends Application {
             pane.getChildren().remove(t12);
             pane.getChildren().remove(sweepLine);
         });
+        Button back = new Button("Back");
+        back.setLayoutX(200);
+        back.setLayoutY(950);
+        back.setPrefWidth(90);
+        back.setPrefHeight(30);
+        back.setOnAction(actionEvent ->{
+            Stage s1 = new Stage();
+            LineIntersection hull = new LineIntersection();
+            try {
+                hull.start(s1);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            stage.close();
+
+        });
 
         pane.getChildren().add(t1);
         pane.getChildren().add(t3);
@@ -155,6 +171,7 @@ public class SweepLineAlgorithm extends Application {
         pane.getChildren().add(t11);
         pane.getChildren().add(b1);
         pane.getChildren().add(clearButton);
+        pane.getChildren().add(back);
 
         stage.setScene(scene);
         stage.show();
@@ -233,24 +250,18 @@ public class SweepLineAlgorithm extends Application {
         sweepLine.setStroke(Color.BLUE);
         pane.getChildren().add(sweepLine);
 
-        // Initialize the Timeline
         Timeline timeline = new Timeline();
 
-        // Set up the KeyFrame for animated movement
         KeyFrame keyFrame = new KeyFrame(Duration.millis(10), event -> {
-            // Move the sweep line downwards
-            double yIncrement = 1; // You can adjust the increment based on your needs
+
+            double yIncrement = 1;
             sweepLine.setStartY(sweepLine.getStartY() + yIncrement);
             sweepLine.setEndY(sweepLine.getEndY() + yIncrement);
 
-            // Check if the sweep line touches one of the end points
             if (sweepLine.getStartY() == segment1.getStart().getY() || sweepLine.getStartY() == segment2.getStart().getY()) {
-                // Check if the line segments intersect
                 if (segment1.intersects(segment2)) {
-                    // The lines intersect
                     points intersection = segment1.getIntersection(segment2);
 
-                    // Draw the intersection point
                     givedotscordinates(intersection,"I");
                     Circle intersectionDot = new Circle(intersection.getX(), intersection.getY(), 5);
                     intersectionDot.setFill(Color.GREEN);
@@ -260,17 +271,12 @@ public class SweepLineAlgorithm extends Application {
             }
         });
 
-        // Add the KeyFrame to the Timeline
         timeline.getKeyFrames().add(keyFrame);
 
-        // Set up the Timeline to repeat until maxY is reached
         timeline.setCycleCount((int) (maxY));
 
-        // Set up an event to show the alert after the timeline completes
         timeline.setOnFinished(event -> {
-            // Check if the line segments intersect
             if (segment1.intersects(segment2)) {
-                // The lines intersect
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Sweep Line Intersection");
@@ -279,7 +285,6 @@ public class SweepLineAlgorithm extends Application {
                     alert.showAndWait();
                 });
             } else {
-                // The lines do not intersect
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Sweep Line Intersection");
@@ -290,7 +295,6 @@ public class SweepLineAlgorithm extends Application {
             }
         });
 
-        // Start the Timeline
         timeline.play();
 
         finalmemoryusage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();

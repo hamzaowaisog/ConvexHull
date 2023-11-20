@@ -98,6 +98,22 @@ public class BruteForceConvexHull extends Application {
 
 
         });
+        Button back = new Button("Back");
+        back.setLayoutX(200);
+        back.setLayoutY(950);
+        back.setPrefWidth(90);
+        back.setPrefHeight(30);
+        back.setOnAction(actionEvent ->{
+            Stage s1 = new Stage();
+            ConvexHull hull = new ConvexHull();
+            try {
+                hull.start(s1);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            stage.close();
+
+        });
 
         points = new ArrayList<>();
         pane.setOnMouseClicked(event -> {
@@ -120,6 +136,7 @@ public class BruteForceConvexHull extends Application {
         pane.getChildren().add(t11);
         pane.getChildren().add(b1);
         pane.getChildren().add(clearButton);
+        pane.getChildren().add(back);
 
         stage.setScene(scene);
         stage.show();

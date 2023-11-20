@@ -140,6 +140,22 @@ public class SlopeMethod extends Application {
             pane.getChildren().remove(t10);
             pane.getChildren().remove(t12);
         });
+        Button back = new Button("Back");
+        back.setLayoutX(200);
+        back.setLayoutY(950);
+        back.setPrefWidth(90);
+        back.setPrefHeight(30);
+        back.setOnAction(actionEvent ->{
+            Stage s1 = new Stage();
+            LineIntersection hull = new LineIntersection();
+            try {
+                hull.start(s1);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            stage.close();
+
+        });
 
         pane.getChildren().add(t1);
         pane.getChildren().add(t3);
@@ -149,6 +165,7 @@ public class SlopeMethod extends Application {
         pane.getChildren().add(t11);
         pane.getChildren().add(b1);
         pane.getChildren().add(clearButton);
+        pane.getChildren().add(back);
 
         stage.setScene(scene);
         stage.show();
