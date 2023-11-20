@@ -65,7 +65,7 @@ public class LineIntersection extends Application {
             @Override
             public void handle(ActionEvent actionEvent) {
                 Stage areamethod = new Stage();
-                BruteForceConvexHull brute = new BruteForceConvexHull();
+                BruteForceLineIntersection brute = new BruteForceLineIntersection();
                 try {
                     brute.start(areamethod);
                 } catch (Exception e) {
