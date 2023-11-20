@@ -95,8 +95,9 @@ public class BruteForceConvexHull extends Application {
             points.clear();
             ij.clear();
             jk.clear();
-
-
+            i=0;
+            j=0;
+            k=0;
         });
         Button back = new Button("Back");
         back.setLayoutX(200);
@@ -107,6 +108,9 @@ public class BruteForceConvexHull extends Application {
             Stage s1 = new Stage();
             ConvexHull hull = new ConvexHull();
             try {
+                points.clear();
+                ij.clear();
+                jk.clear();
                 hull.start(s1);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -167,51 +171,85 @@ public class BruteForceConvexHull extends Application {
 
 
     }
-    static boolean shouldContinue = true;
-    static Stack<Line> ij = new Stack<>();
-    static Stack<Line> jk = new Stack<>();
-    static Timeline tl = new Timeline();
-     static int i = 0, j = 0, k = 0;
+    boolean shouldContinue = true;
+    Stack<Line> ij = new Stack<>();
+    Stack<Line> jk = new Stack<>();
+    Timeline tl = new Timeline();
+    int i = 0, j = 0, k = 0;
+    ArrayList<points> convexhull ;
 
     private void findConvexHull1(ArrayList<com.example.demo.points> points) {
-        ArrayList<points> p1 = points;
+        convexhull = points;
         tl.setCycleCount(Timeline.INDEFINITE);
 
         KeyFrame kf = new KeyFrame(Duration.seconds(0.01), actionEvent -> {
-            if (points.get(i) != points.get(j)) {
-                drawLineIJ(points.get(i), points.get(j));
-                if (points.get(k) != points.get(j) && points.get(k) != points.get(i)) {
-                    drawLineJK(points.get(j), points.get(k));
-                    if (ccwSlope(points.get(i), points.get(j), points.get(k)) == 1) {
-                        pane.getChildren().remove(ij.pop());
-                        shouldContinue = false;
+            if(i<points.size() && j<points.size() && k < points.size()) {
+                if (points.get(i) != points.get(j)) {
+                    drawLineIJ(points.get(i), points.get(j));
+                    if (points.get(k) != points.get(j) && points.get(k) != points.get(i)) {
+                        drawLineJK(points.get(j), points.get(k));
+                        if (ccwSlope(points.get(i), points.get(j), points.get(k)) == 1) {
+                           pane.getChildren().remove(ij.pop());
+                            shouldContinue = false;
+                        }
+                        pane.getChildren().remove(jk.pop());
                     }
-                    pane.getChildren().remove(jk.pop());
+                    k++;
+                    if (!shouldContinue) {
+                        j++;
+                        k = 0;
+                        shouldContinue = true;
+                    }
+                } else {
+                    j++;
                 }
-                k++;
-                if (!shouldContinue) {
+            }
+                if (k >= points.size() && shouldContinue) {
+                   // drawLineIJ(points.get(i), points.get(j));
+                }
+                if (k >= points.size()) {
                     j++;
                     k = 0;
                     shouldContinue = true;
                 }
-            } else {
-                j++;
-            }
-            if (k >= points.size() && shouldContinue) {
-                drawLineIJ(points.get(i), points.get(j));
-            }
-            if (k >= points.size()) {
-                j++;
-                k = 0;
-                shouldContinue = true;
-            }
-            if (j >= points.size()) {
-                i++;
-                j = 0;
-            }
-            if (i >= points.size()) {
-                tl.stop();
-            }
+                if (j >= points.size()) {
+                    i++;
+                    j = 0;
+                }
+                if (i >= points.size()) {
+                    tl.stop();
+                    gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+                    for(Line l : ij){
+                        pane.getChildren().remove(l);
+                    }
+                    for(int ii = 0 ; ii < convexhull.size() ; ii++){
+                        for (int jj = 0 ; jj < convexhull.size() ; jj++){
+                            if(convexhull.get(ii)!=convexhull.get(jj)){
+                                //draw temp line ij
+                                for(int kk = 0 ; kk < convexhull.size() ; kk++){
+                                    shouldContinue = true;
+                                    if(convexhull.get(kk) != convexhull.get(jj) && convexhull.get(kk)!=convexhull.get(ii)){
+                                        //draw line jk
+                                        if(ccwSlope(convexhull.get(ii),convexhull.get(jj),convexhull.get(kk))==-1){
+                                            //remove line jk
+                                            shouldContinue = false;
+                                        }
+                                        //remove line ij
+                                        if(!shouldContinue){
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if(shouldContinue){
+                                //perma line ij
+                                points p11 = new points(convexhull.get(ii).getX(),convexhull.get(ii).getY());
+                                com.example.demo.points p2 = new points(convexhull.get(jj).getX(),convexhull.get(jj).getY());
+                                drawLine(p11,p2);
+                            }
+                        }
+                    }
+                }
         });
         tl.getKeyFrames().add(kf);
         tl.play();
@@ -244,14 +282,14 @@ public class BruteForceConvexHull extends Application {
     private void drawLineIJ(points a, points b) {
         if(ij.isEmpty()){
             Line l1 = new Line(a.getX(), a.getY(), b.getX(), b.getY());
-            l1.setStroke(Color.BLUE);
+            l1.setStroke(Color.RED);
             l1.setStrokeWidth(2);
             pane.getChildren().add(l1);
             ij.push(l1);
         }
         if((a.getX()!=ij.peek().getStartX() && a.getY()!=ij.peek().getStartY()) || (b.getX()!=ij.peek().getEndX() && b.getY()!=ij.peek().getEndY()) ){
             Line l1 = new Line(a.getX(), a.getY(), b.getX(), b.getY());
-            l1.setStroke(Color.BLUE);
+            l1.setStroke(Color.RED);
             l1.setStrokeWidth(2);
             pane.getChildren().add(l1);
             ij.push(l1);
@@ -417,12 +455,6 @@ public class BruteForceConvexHull extends Application {
 //            }
 //        }
 //   }
-
-    public void changeColor(points p, Color color) {
-        Circle circle = new Circle(p.getX(), p.getY(), 5);
-        circle.setFill(color);
-        pane.getChildren().add(circle);
-    }
 
 
 //    public void findConvexHull(ArrayList<points> points){

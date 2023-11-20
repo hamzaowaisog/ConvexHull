@@ -102,6 +102,8 @@ public class QuickHullConvexHull extends Application {
             Stage s1 = new Stage();
             ConvexHull hull = new ConvexHull();
             try {
+                points.clear();
+                lines.clear();
                 hull.start(s1);
             } catch (Exception e) {
                 throw new RuntimeException(e);
