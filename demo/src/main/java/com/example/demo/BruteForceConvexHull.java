@@ -93,6 +93,10 @@ public class BruteForceConvexHull extends Application {
             pane.getChildren().remove(t10);
             pane.getChildren().remove(t12);
             points.clear();
+            ij.clear();
+            jk.clear();
+
+
         });
 
         points = new ArrayList<>();
