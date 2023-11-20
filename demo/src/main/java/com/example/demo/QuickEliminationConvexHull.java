@@ -136,6 +136,23 @@ public class QuickEliminationConvexHull extends Application {
         back.setPrefWidth(90);
         back.setPrefHeight(30);
         back.setOnAction(actionEvent ->{
+            hull.clear();
+            points.clear();
+            lines.clear();
+            lines2.clear();
+            lines3.clear();
+            lines4.clear();
+            lines5.clear();
+            dots1.clear();
+            dots2.clear();
+            dots3.clear();
+            dots4.clear();
+            dots5.clear();
+            region1.clear();
+            region2.clear();
+            region3.clear();
+            region4.clear();
+            convexhull.clear();
             Stage s1 = new Stage();
             ConvexHull hull = new ConvexHull();
             try {

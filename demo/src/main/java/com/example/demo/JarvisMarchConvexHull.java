@@ -98,6 +98,7 @@ public class JarvisMarchConvexHull extends Application {
         back.setPrefWidth(90);
         back.setPrefHeight(30);
         back.setOnAction(actionEvent ->{
+            points.clear();
             Stage s1 = new Stage();
             ConvexHull hull = new ConvexHull();
             try {

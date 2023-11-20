@@ -105,12 +105,12 @@ public class BruteForceConvexHull extends Application {
         back.setPrefWidth(90);
         back.setPrefHeight(30);
         back.setOnAction(actionEvent ->{
+            points.clear();
+            ij.clear();
+            jk.clear();
             Stage s1 = new Stage();
             ConvexHull hull = new ConvexHull();
             try {
-                points.clear();
-                ij.clear();
-                jk.clear();
                 hull.start(s1);
             } catch (Exception e) {
                 throw new RuntimeException(e);
