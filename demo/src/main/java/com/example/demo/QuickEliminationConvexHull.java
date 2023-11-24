@@ -759,9 +759,19 @@ for(int i=0;i<region4.size();i++){
                 });
                 PauseTransition pause2 = new PauseTransition(Duration.seconds(1.5));
                 pause2.setOnFinished(actionEvent1 -> {
-                    for(Line l : lines2){
-                        pane.getChildren().add(l);
+                    Timeline timeline = new Timeline();
+                    double delay = 0.0;
+                    for (Line l : lines2) {
+                    KeyFrame keyFrame = new KeyFrame(Duration.seconds(delay), e -> pane.getChildren().add(l));
+                    timeline.getKeyFrames().add(keyFrame);
+                    delay += 0.5; // delay in seconds between each line
                     }
+
+                    timeline.play();
+
+//                    for(Line l : lines2){
+//                        pane.getChildren().add(l);
+//                    }
                 });
                 PauseTransition pause3 = new PauseTransition(Duration.seconds(2));
                 pause3.setOnFinished(actionEvent1 -> {
@@ -772,10 +782,20 @@ for(int i=0;i<region4.size();i++){
 
                 PauseTransition pause4 = new PauseTransition(Duration.seconds(2.5));
                 pause4.setOnFinished(actionEvent1 -> {
-                    for(Line l : lines3){
-                        pane.getChildren().add(l);
-                    }
-                });
+                            Timeline timeline = new Timeline();
+                            double delay = 0.0;
+                            for (Line l : lines3) {
+                                KeyFrame keyFrame = new KeyFrame(Duration.seconds(delay), e -> pane.getChildren().add(l));
+                                timeline.getKeyFrames().add(keyFrame);
+                                delay += 0.5; // delay in seconds between each line
+                            }
+
+                            timeline.play();
+                        });
+//                    for(Line l : lines3){
+//                        pane.getChildren().add(l);
+//                    }
+//                });
                 PauseTransition pause5 = new PauseTransition(Duration.seconds(3));
                 pause5.setOnFinished(actionEvent1 -> {
                     for(Circle c : dots3){
@@ -785,9 +805,15 @@ for(int i=0;i<region4.size();i++){
 
                 PauseTransition pause6 = new PauseTransition(Duration.seconds(3.5));
                 pause6.setOnFinished(actionEvent1 -> {
-                    for(Line l : lines4){
-                        pane.getChildren().add(l);
+                    Timeline timeline = new Timeline();
+                    double delay = 0.0;
+                    for (Line l : lines4) {
+                        KeyFrame keyFrame = new KeyFrame(Duration.seconds(delay), e -> pane.getChildren().add(l));
+                        timeline.getKeyFrames().add(keyFrame);
+                        delay += 0.5; // delay in seconds between each line
                     }
+
+                    timeline.play();
                 });
                 PauseTransition pause7 = new PauseTransition(Duration.seconds(4));
                 pause7.setOnFinished(actionEvent1 -> {
@@ -798,9 +824,15 @@ for(int i=0;i<region4.size();i++){
 
                 PauseTransition pause8 = new PauseTransition(Duration.seconds(4.5));
                 pause8.setOnFinished(actionEvent1 -> {
-                    for(Line l : lines5){
-                        pane.getChildren().add(l);
+                    Timeline timeline = new Timeline();
+                    double delay = 0.0;
+                    for (Line l : lines5) {
+                        KeyFrame keyFrame = new KeyFrame(Duration.seconds(delay), e -> pane.getChildren().add(l));
+                        timeline.getKeyFrames().add(keyFrame);
+                        delay += 0.5; // delay in seconds between each line
                     }
+
+                    timeline.play();
                 });
                 PauseTransition pause9 = new PauseTransition(Duration.seconds(5));
                 pause9.setOnFinished(actionEvent1 -> {
