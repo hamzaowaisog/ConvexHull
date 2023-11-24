@@ -757,7 +757,7 @@ for(int i=0;i<region4.size();i++){
                         pane.getChildren().add(c);
                     }
                 });
-                PauseTransition pause2 = new PauseTransition(Duration.seconds(1.5));
+                PauseTransition pause2 = new PauseTransition(Duration.seconds(2.0));
                 pause2.setOnFinished(actionEvent1 -> {
                     Timeline timeline = new Timeline();
                     double delay = 0.0;
@@ -773,14 +773,14 @@ for(int i=0;i<region4.size();i++){
 //                        pane.getChildren().add(l);
 //                    }
                 });
-                PauseTransition pause3 = new PauseTransition(Duration.seconds(2));
+                PauseTransition pause3 = new PauseTransition(Duration.seconds(2.5));
                 pause3.setOnFinished(actionEvent1 -> {
                     for(Circle c : dots2){
                         pane.getChildren().add(c);
                     }
                 });
 
-                PauseTransition pause4 = new PauseTransition(Duration.seconds(2.5));
+                PauseTransition pause4 = new PauseTransition(Duration.seconds(3));
                 pause4.setOnFinished(actionEvent1 -> {
                             Timeline timeline = new Timeline();
                             double delay = 0.0;
@@ -796,14 +796,14 @@ for(int i=0;i<region4.size();i++){
 //                        pane.getChildren().add(l);
 //                    }
 //                });
-                PauseTransition pause5 = new PauseTransition(Duration.seconds(3));
+                PauseTransition pause5 = new PauseTransition(Duration.seconds(3.5));
                 pause5.setOnFinished(actionEvent1 -> {
                     for(Circle c : dots3){
                         pane.getChildren().add(c);
                     }
                 });
 
-                PauseTransition pause6 = new PauseTransition(Duration.seconds(3.5));
+                PauseTransition pause6 = new PauseTransition(Duration.seconds(4));
                 pause6.setOnFinished(actionEvent1 -> {
                     Timeline timeline = new Timeline();
                     double delay = 0.0;
@@ -815,14 +815,14 @@ for(int i=0;i<region4.size();i++){
 
                     timeline.play();
                 });
-                PauseTransition pause7 = new PauseTransition(Duration.seconds(4));
+                PauseTransition pause7 = new PauseTransition(Duration.seconds(4.5));
                 pause7.setOnFinished(actionEvent1 -> {
                     for(Circle c : dots4){
                         pane.getChildren().add(c);
                     }
                 });
 
-                PauseTransition pause8 = new PauseTransition(Duration.seconds(4.5));
+                PauseTransition pause8 = new PauseTransition(Duration.seconds(5));
                 pause8.setOnFinished(actionEvent1 -> {
                     Timeline timeline = new Timeline();
                     double delay = 0.0;
@@ -834,7 +834,7 @@ for(int i=0;i<region4.size();i++){
 
                     timeline.play();
                 });
-                PauseTransition pause9 = new PauseTransition(Duration.seconds(5));
+                PauseTransition pause9 = new PauseTransition(Duration.seconds(5.5));
                 pause9.setOnFinished(actionEvent1 -> {
                     for(Circle c : dots5){
                         pane.getChildren().add(c);
